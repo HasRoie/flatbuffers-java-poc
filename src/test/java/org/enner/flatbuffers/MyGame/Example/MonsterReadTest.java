@@ -56,18 +56,21 @@ public class MonsterReadTest {
 
     @Test
     public void testGetInventory() throws Exception {
+        int monster = Monster.getMonsterFromRoot(bb);
+        assertEquals(this.monster.inventory(0), Monster.getInventory(bb, monster, 0));
+        assertEquals(this.monster.inventory(4), Monster.getInventory(bb, monster, 4));
+    }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetInventoryOutOfBounds() throws Exception {
+        int monster = Monster.getMonsterFromRoot(bb);
+        Monster.getInventory(bb, monster, 5);
     }
 
     @Test
     public void testGetInventoryLength() throws Exception {
         int monster = Monster.getMonsterFromRoot(bb);
         assertEquals(this.monster.inventoryLength(), Monster.getInventoryLength(bb, monster));
-    }
-
-    @Test
-    public void testGetInventory1() throws Exception {
-
     }
 
     @Test

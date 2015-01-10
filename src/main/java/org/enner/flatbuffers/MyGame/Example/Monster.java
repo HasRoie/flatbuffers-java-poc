@@ -39,17 +39,16 @@ public class Monster {
         return null;
     }
 
-    public static byte getInventory(ByteBuffer bb, int monster) {
-        return 0;
-    }
-
     public static int getInventoryLength(ByteBuffer bb, int monster) {
         int offset = 14;
         return Table.getVectorLength(bb, monster, offset);
     }
 
-    public static byte getInventory(ByteBuffer bb, int monster, int i) {
-        return 0;
+    public static byte getInventory(ByteBuffer bb, int monster, int index) {
+        int offset = 14;
+        int elementSize = 1;
+        int elementAddress = Table.getVectorElementAddress(bb, monster, offset, index, elementSize);
+        return bb.get(elementAddress);
     }
 
     public static Color getColor(ByteBuffer bb, int monster) {

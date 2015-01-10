@@ -2,6 +2,8 @@ package org.enner.flatbuffers;
 
 import java.nio.ByteBuffer;
 
+import static org.enner.flatbuffers.Constants.*;
+
 /**
  * @author Florian Enner < florian @ hebirobotics.com >
  * @since 10 Jan 2015
@@ -13,7 +15,7 @@ public class Table {
         return address == NULL ? defaultValue : bb.getShort(address);
     }
 
-    public static int getPointerValue(ByteBuffer bb, int tableAddress, int entryOffset) {
+    public static int getAddressValue(ByteBuffer bb, int tableAddress, int entryOffset) {
         // Pointers are stored as ints relative to itself
         int address = Table.getPointerToEntry(bb, tableAddress, entryOffset);
         return address == NULL ? NULL : bb.getInt(address) + address;
@@ -21,8 +23,22 @@ public class Table {
 
     public static int getVectorLength(ByteBuffer bb, int tableAddress, int entryOffset) {
         // The length is the first int of a vector
-        int address = getPointerValue(bb, tableAddress, entryOffset);
+        int address = getAddressValue(bb, tableAddress, entryOffset);
         return address == NULL ? 0 : bb.getInt(address);
+    }
+
+    public static int getVectorElementAddress(ByteBuffer bb, int tableAddress, int entryOffset, int index, int elementSize) {
+        // Check if there is an entry
+        int address = getAddressValue(bb, tableAddress, entryOffset);
+        if (address == NULL) return NULL;
+
+        // Make sure index is not out of bounds
+        int numElements = bb.getInt(address);
+        if (index >= numElements)
+            throw new IllegalArgumentException("Vector index is out of bounds.");
+
+        // Data starts directly after the size header, in contiguous memory
+        return address + SIZEOF_INT + index * elementSize;
     }
 
     public static int NULL = 0;

@@ -38,7 +38,6 @@ public class JavaTest {
         float y = Vec3.getY(bb, vec3);
         float z = Vec3.getZ(bb, vec3);
 
-        int inventory = Monster.getInventory(bb, monster);
         int inventoryLength = Monster.getInventoryLength(bb, monster);
         for (int i = 0; i < inventoryLength; i++) {
             byte inv = Monster.getInventory(bb, monster, i);
