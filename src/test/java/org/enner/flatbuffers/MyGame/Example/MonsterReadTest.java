@@ -44,9 +44,9 @@ public class MonsterReadTest {
     public void testGetPos() throws Exception {
         int monster = Monster.getMonsterFromRoot(bb);
         int pos = Monster.getPos(bb, monster);
-        assertEquals(this.pos.x(), Vec3.getX(bb, pos), 1E-10);
-        assertEquals(this.pos.y(), Vec3.getY(bb, pos), 1E-10);
-        assertEquals(this.pos.z(), Vec3.getZ(bb, pos), 1E-10);
+        assertEquals(this.pos.x(), Vec3.getX(bb, pos), 0);
+        assertEquals(this.pos.y(), Vec3.getY(bb, pos), 0);
+        assertEquals(this.pos.z(), Vec3.getZ(bb, pos), 0);
     }
 
     @Test
