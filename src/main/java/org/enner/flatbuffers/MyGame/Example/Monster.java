@@ -26,7 +26,8 @@ public class Monster {
     }
 
     public static int getPos(ByteBuffer bb, int monster) {
-        return 0;
+        int offset = 4;
+        return Table.getEntryAddress(bb, monster, offset);
     }
 
     public static short getMana(ByteBuffer bb, int monster) {
@@ -52,7 +53,10 @@ public class Monster {
     }
 
     public static Color getColor(ByteBuffer bb, int monster) {
-        return null;
+        int offset = 16;
+        byte defaultValue = 8;
+        byte enumValue = Table.getByteValue(bb, monster, offset, defaultValue);
+        return Color.getByValue(enumValue);
     }
 
 }

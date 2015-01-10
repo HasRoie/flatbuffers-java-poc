@@ -14,12 +14,14 @@ public class MonsterReadTest {
     byte[] testData;
     ByteBuffer bb;
     com.google.flatbuffers.MyGame.Example.Monster monster;
+    com.google.flatbuffers.MyGame.Example.Vec3 pos;
 
     @Before
     public void setUp() throws Exception {
         testData = GoogleTestData.createTestData();
         bb = ByteBuffer.wrap(testData);
         monster = com.google.flatbuffers.MyGame.Example.Monster.getRootAsMonster(bb);
+        pos = monster.pos();
     }
 
     @After
@@ -40,7 +42,11 @@ public class MonsterReadTest {
 
     @Test
     public void testGetPos() throws Exception {
-
+        int monster = Monster.getMonsterFromRoot(bb);
+        int pos = Monster.getPos(bb, monster);
+        assertEquals(this.pos.x(), Vec3.getX(bb, pos), 1E-10);
+        assertEquals(this.pos.y(), Vec3.getY(bb, pos), 1E-10);
+        assertEquals(this.pos.z(), Vec3.getZ(bb, pos), 1E-10);
     }
 
     @Test
@@ -75,6 +81,8 @@ public class MonsterReadTest {
 
     @Test
     public void testGetColor() throws Exception {
-
+        int monster = Monster.getMonsterFromRoot(bb);
+        assertEquals(this.monster.color(), Monster.getColor(bb, monster).getValue());
     }
+
 }

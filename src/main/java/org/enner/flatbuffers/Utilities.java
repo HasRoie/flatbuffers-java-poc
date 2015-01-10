@@ -18,10 +18,23 @@ package org.enner.flatbuffers;
 
 // Class that holds shared constants.
 
-public class Constants {
+public class Utilities {
     // Java doesn't seem to have these.
     static final int SIZEOF_SHORT = 2;
     static final int SIZEOF_INT = 4;
     static final int FILE_IDENTIFIER_LENGTH = 4;
+
+    // Store unsigned values in a larger type
+    static short unsigned(byte value) {
+        return (short) (value & 0xFF);
+    }
+
+    static int unsigned(short value) {
+        return value & 0xFFFF;
+    }
+
+    static long unsigned(int value) {
+        return value & 0xFFFFFFFFL;
+    }
 }
 

@@ -9,12 +9,29 @@ public enum Color {
     GREEN(2, "Green"),
     BLUE(8, "Blue");
 
-    Color(int id, String name) {
-        this.id = (byte) id;
+    public String getName() {
+        return name;
+    }
+
+    public byte getValue() {
+        return value;
+    }
+
+    public static Color getByValue(byte value) {
+        for (int i = 0; i < elements.length; i++) {
+            if (elements[i].value == value)
+                return elements[i];
+        }
+        return null;
+    }
+
+    private Color(int id, String name) {
+        this.value = (byte) id;
         this.name = name;
     }
 
-    final byte id;
-    final String name;
+    private final byte value;
+    private final String name;
+    private final static Color[] elements = Color.values();
 
 }

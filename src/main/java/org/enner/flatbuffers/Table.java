@@ -2,7 +2,7 @@ package org.enner.flatbuffers;
 
 import java.nio.ByteBuffer;
 
-import static org.enner.flatbuffers.Constants.*;
+import static org.enner.flatbuffers.Utilities.*;
 
 /**
  * @author Florian Enner < florian @ hebirobotics.com >
@@ -10,14 +10,60 @@ import static org.enner.flatbuffers.Constants.*;
  */
 public class Table {
 
+    /**
+     * Bool / Byte / Enum
+     */
+    public static byte getByteValue(ByteBuffer bb, int tableAddress, int entryOffset, byte defaultValue) {
+        int address = Table.getEntryAddress(bb, tableAddress, entryOffset);
+        return address == NULL ? defaultValue : bb.get(address);
+    }
+
+    /**
+     * Unsigned Byte
+     */
+    public static short getUnsignedByteValue(ByteBuffer bb, int tableAddress, int entryOffset, short defaultValue) {
+        int address = Table.getEntryAddress(bb, tableAddress, entryOffset);
+        return address == NULL ? defaultValue : unsigned(bb.get(address));
+    }
+
+    /**
+     * Short
+     */
     public static short getShortValue(ByteBuffer bb, int tableAddress, int entryOffset, short defaultValue) {
-        int address = Table.getPointerToEntry(bb, tableAddress, entryOffset);
+        int address = Table.getEntryAddress(bb, tableAddress, entryOffset);
         return address == NULL ? defaultValue : bb.getShort(address);
     }
 
+    /**
+     * Unsigned Short
+     */
+    public static int getUnsignedShortValue(ByteBuffer bb, int tableAddress, int entryOffset, int defaultValue) {
+        int address = Table.getEntryAddress(bb, tableAddress, entryOffset);
+        return address == NULL ? defaultValue : unsigned(bb.getShort(address));
+    }
+
+    /**
+     * Integer
+     */
+    public static int getIntegerValue(ByteBuffer bb, int tableAddress, int entryOffset, int defaultValue) {
+        int address = Table.getEntryAddress(bb, tableAddress, entryOffset);
+        return address == NULL ? defaultValue : bb.getInt(address);
+    }
+
+    /**
+     * Unsigned Integer
+     */
+    public static long getUnsignedIntegerValue(ByteBuffer bb, int tableAddress, int entryOffset, long defaultValue) {
+        int address = Table.getEntryAddress(bb, tableAddress, entryOffset);
+        return address == NULL ? defaultValue : unsigned(bb.getInt(address));
+    }
+
+    /**
+     * Tables / Strings / Unions / Vectors
+     */
     public static int getAddressValue(ByteBuffer bb, int tableAddress, int entryOffset) {
         // Pointers are stored as ints relative to itself
-        int address = Table.getPointerToEntry(bb, tableAddress, entryOffset);
+        int address = Table.getEntryAddress(bb, tableAddress, entryOffset);
         return address == NULL ? NULL : bb.getInt(address) + address;
     }
 
@@ -39,6 +85,17 @@ public class Table {
 
         // Data starts directly after the size header, in contiguous memory
         return address + SIZEOF_INT + index * elementSize;
+    }
+
+    /**
+     * Returns the absolute address of the pointer in the vector table. Returns 0 on failure
+     */
+    public static int getEntryAddress(ByteBuffer bb, int tableAddress, int entryOffset) {
+        // Construct the absolute address based on the relative pointer. NULL means the value
+        // doesn't exist. Note: The corner case where address+offset=NULL can't happen because
+        // addresses and offsets are both unsigned.
+        int offset = Table.getRelativePointerToEntry(bb, tableAddress, entryOffset);
+        return offset == NULL ? NULL : tableAddress + offset;
     }
 
     public static int NULL = 0;
@@ -77,20 +134,6 @@ public class Table {
         int vtableAddress = Table.getVectorTableAddress(bb, tableAddress);
         int offset = Table.getVectorTableOffset(bb, vtableAddress, entryOffset);
         return offset;
-    }
-
-    static int getPointerToEntry(ByteBuffer bb, int tableAddress, int entryOffset) {
-        // Construct the absolute address based on the relative pointer. NULL means the value
-        // doesn't exist. Note: The corner case where address+offset=NULL can't happen because
-        // addresses and offsets are both unsigned.
-        int offset = Table.getRelativePointerToEntry(bb, tableAddress, entryOffset);
-        return offset == NULL ? NULL : tableAddress + offset;
-    }
-
-    static int unsigned(short value) {
-        // store uint16 in int since Java doesn't
-        // have unsigned types
-        return value & 0xFFFF;
     }
 
 }
