@@ -1,5 +1,7 @@
 package org.enner.flatbuffers.MyGame.Example;
 
+import org.enner.flatbuffers.Table;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -20,30 +22,7 @@ public class Monster {
     public static short getHp(ByteBuffer bb, int monster) {
         int entryOffset = 8;
         short defaultValue = 100;
-
-        // Start of object holds the relative offset to its vtable
-        // Note that the offset is subtracted, not added
-        int vtableOffset = bb.getInt(monster);
-        int vtableAddress = monster - vtableOffset;
-
-        // Read the length of vtable as the first short (needed
-        // for backwards compatibility in case fields got added)
-        int vtableLength = bb.getShort(vtableAddress) & 0xFFFF; // unsigned
-
-        // Find the entry address that is stored relative to the vtable (auto-gen)
-        if (entryOffset < vtableLength) {
-
-            int hpOffset = bb.getShort(vtableAddress + entryOffset) & 0xFFFF; // unsigned
-            if (hpOffset == 0)
-                return defaultValue;
-
-            int hpAddress = monster + hpOffset; // offset from start of object
-            short hp = bb.getShort(hpAddress);
-            return hp;
-
-        } else {
-            return 0;
-        }
+        return Table.getShortValue(bb, monster, entryOffset, defaultValue);
     }
 
     public static int getPos(ByteBuffer bb, int monster) {
@@ -53,30 +32,7 @@ public class Monster {
     public static short getMana(ByteBuffer bb, int monster) {
         int entryOffset = 6;
         short defaultValue = 150;
-
-        // Start of object holds the relative offset to its vtable
-        // Note that the offset is subtracted, not added
-        int vtableOffset = bb.getInt(monster);
-        int vtableAddress = monster - vtableOffset;
-
-        // Read the length of vtable as the first short (needed
-        // for backwards compatibility in case fields got added)
-        int vtableLength = bb.getShort(vtableAddress) & 0xFFFF; // unsigned
-
-        // Find the entry address that is stored relative to the vtable (auto-gen)
-        if (entryOffset < vtableLength) {
-
-            int hpOffset = bb.getShort(vtableAddress + entryOffset) & 0xFFFF; // unsigned
-            if (hpOffset == 0)
-                return defaultValue;
-
-            int hpAddress = monster + hpOffset; // offset from start of object
-            short hp = bb.getShort(hpAddress);
-            return hp;
-
-        } else {
-            return 0;
-        }
+        return Table.getShortValue(bb, monster, entryOffset, defaultValue);
     }
 
     public static String getName(ByteBuffer bb, int monster) {
