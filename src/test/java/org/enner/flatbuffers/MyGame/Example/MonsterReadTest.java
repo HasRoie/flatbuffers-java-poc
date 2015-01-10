@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 
 import static org.junit.Assert.*;
 
-public class MonsterTest {
+public class MonsterReadTest {
 
     byte[] testData;
     ByteBuffer bb;
@@ -29,14 +29,13 @@ public class MonsterTest {
 
     @Test
     public void testGetMonsterFromRoot() throws Exception {
-        assertEquals(48, MonsterReadTest.getMonsterFromRoot(bb));
+        assertEquals(48, Monster.getMonsterFromRoot(bb));
     }
 
     @Test
     public void testGetHp() throws Exception {
-        int monster = MonsterReadTest.getMonsterFromRoot(bb);
-        short hp = MonsterReadTest.getHp(bb, monster);
-        assertEquals(this.monster.hp(), hp);
+        int monster = Monster.getMonsterFromRoot(bb);
+        assertEquals(this.monster.hp(), Monster.getHp(bb, monster));
     }
 
     @Test
@@ -46,7 +45,8 @@ public class MonsterTest {
 
     @Test
     public void testGetMana() throws Exception {
-
+        int monster = Monster.getMonsterFromRoot(bb);
+        assertEquals(this.monster.mana(), Monster.getMana(bb, monster));
     }
 
     @Test

@@ -28,23 +28,23 @@ public class JavaTest {
 
     static void testBuffer(ByteBuffer bb) {
 
-        int monster = MonsterReadTest.getMonsterFromRoot(bb);
-        short hp = MonsterReadTest.getHp(bb, monster);
-        short mana = MonsterReadTest.getMana(bb, monster);
-        String name = MonsterReadTest.getName(bb, monster);
+        int monster = Monster.getMonsterFromRoot(bb);
+        short hp = Monster.getHp(bb, monster);
+        short mana = Monster.getMana(bb, monster);
+        String name = Monster.getName(bb, monster);
 
-        int vec3 = MonsterReadTest.getPos(bb, monster);
+        int vec3 = Monster.getPos(bb, monster);
         float x = Vec3.getX(bb, vec3);
         float y = Vec3.getY(bb, vec3);
         float z = Vec3.getZ(bb, vec3);
 
-        int inventory = MonsterReadTest.getInventory(bb, monster);
-        int inventoryLength = MonsterReadTest.getInventoryLength(bb, monster);
+        int inventory = Monster.getInventory(bb, monster);
+        int inventoryLength = Monster.getInventoryLength(bb, monster);
         for (int i = 0; i < inventoryLength; i++) {
-            byte inv = MonsterReadTest.getInventory(bb, monster, i);
+            byte inv = Monster.getInventory(bb, monster, i);
         }
 
-        Color color = MonsterReadTest.getColor(bb, monster);
+        Color color = Monster.getColor(bb, monster);
 
     }
 
