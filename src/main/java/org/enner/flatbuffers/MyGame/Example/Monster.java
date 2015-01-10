@@ -1,6 +1,9 @@
 package org.enner.flatbuffers.MyGame.Example;
 
+import org.enner.flatbuffers.Pointer;
 import org.enner.flatbuffers.Table;
+import org.enner.flatbuffers.Utilities;
+import org.enner.flatbuffers.Vector;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -22,18 +25,21 @@ public class Monster {
     public static short getHp(ByteBuffer bb, int monster) {
         int offset = 8;
         short defaultValue = 100;
-        return Table.getShortValue(bb, monster, offset, defaultValue);
+
+        int address = Table.getElementAddress(bb, monster, offset);
+        return Utilities.getShort(bb, address, defaultValue);
     }
 
     public static int getPos(ByteBuffer bb, int monster) {
         int offset = 4;
-        return Table.getEntryAddress(bb, monster, offset);
+        return Table.getElementAddress(bb, monster, offset);
     }
 
     public static short getMana(ByteBuffer bb, int monster) {
         int offset = 6;
         short defaultValue = 150;
-        return Table.getShortValue(bb, monster, offset, defaultValue);
+        int address = Table.getElementAddress(bb, monster, offset);
+        return Utilities.getShort(bb, address, defaultValue);
     }
 
     public static String getName(ByteBuffer bb, int monster) {
@@ -42,20 +48,26 @@ public class Monster {
 
     public static int getInventoryLength(ByteBuffer bb, int monster) {
         int offset = 14;
-        return Table.getVectorLength(bb, monster, offset);
+        int pointer = Table.getElementAddress(bb, monster, offset);
+        int vector = Pointer.dereference(bb, pointer);
+        return Vector.getLength(bb, vector);
     }
 
     public static byte getInventory(ByteBuffer bb, int monster, int index) {
         int offset = 14;
         int elementSize = 1;
-        int elementAddress = Table.getVectorElementAddress(bb, monster, offset, index, elementSize);
-        return bb.get(elementAddress);
+        byte defaultValue = 0;
+        int pointer = Table.getElementAddress(bb, monster, offset);
+        int vector = Pointer.dereference(bb, pointer);
+        int address = Vector.getElementAddress(bb, vector, index, elementSize);
+        return Utilities.getByte(bb, address, defaultValue);
     }
 
     public static Color getColor(ByteBuffer bb, int monster) {
         int offset = 16;
         byte defaultValue = 8;
-        byte enumValue = Table.getByteValue(bb, monster, offset, defaultValue);
+        int address = Table.getElementAddress(bb, monster, offset);
+        byte enumValue = Utilities.getByte(bb, address, defaultValue);
         return Color.getByValue(enumValue);
     }
 

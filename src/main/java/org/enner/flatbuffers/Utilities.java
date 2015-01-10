@@ -1,40 +1,61 @@
-/*
- * Copyright 2014 Google Inc. All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.enner.flatbuffers;
 
-// Class that holds shared constants.
+import java.nio.ByteBuffer;
 
+/**
+ * This class contains convenience functions related to parsing
+ * elements from addresses. They return defaults if addresses are
+ * NULL.
+ *
+ * @author Florian Enner < florian @ hebirobotics.com >
+ * @since 10 Jan 2015
+ */
 public class Utilities {
-    // Java doesn't seem to have these.
-    static final int SIZEOF_SHORT = 2;
-    static final int SIZEOF_INT = 4;
-    static final int FILE_IDENTIFIER_LENGTH = 4;
 
-    // Store unsigned values in a larger type
-    static short unsigned(byte value) {
+    static final int SIZEOF_SHORT = Short.BYTES;
+    static final int SIZEOF_INT = Integer.BYTES;
+    static final int FILE_IDENTIFIER_LENGTH = 4;
+    public static int NULL = 0;
+
+    /**
+     * Bool / Byte / Enum
+     */
+    public static byte getByte(ByteBuffer bb, int address, byte defaultValue) {
+        return address == NULL ? defaultValue : bb.get(address);
+    }
+
+    public static short getShort(ByteBuffer bb, int address, short defaultValue) {
+        return address == NULL ? defaultValue : bb.getShort(address);
+    }
+
+    public static int getInt(ByteBuffer bb, int address, int defaultValue) {
+        return address == NULL ? defaultValue : bb.getInt(address);
+    }
+
+    // Store unsigned values in larger types
+
+    public static short getUnsignedByte(ByteBuffer bb, int address, short defaultValue) {
+        return address == NULL ? defaultValue : unsigned(bb.get(address));
+    }
+
+    public static int getUnsignedShort(ByteBuffer bb, int address, int defaultValue) {
+        return address == NULL ? defaultValue : unsigned(bb.getShort(address));
+    }
+
+    public static long getUnsignedInt(ByteBuffer bb, int address, long defaultValue) {
+        return address == NULL ? defaultValue : unsigned(bb.getInt(address));
+    }
+
+    public static short unsigned(byte value) {
         return (short) (value & 0xFF);
     }
 
-    static int unsigned(short value) {
+    public static int unsigned(short value) {
         return value & 0xFFFF;
     }
 
-    static long unsigned(int value) {
+    public static long unsigned(int value) {
         return value & 0xFFFFFFFFL;
     }
-}
 
+}
