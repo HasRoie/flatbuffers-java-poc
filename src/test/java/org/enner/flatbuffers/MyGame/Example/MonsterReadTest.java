@@ -57,7 +57,8 @@ public class MonsterReadTest {
 
     @Test
     public void testGetName() throws Exception {
-
+        int monster = Monster.getMonsterFromRoot(bb);
+        assertEquals(this.monster.name(), Monster.getName(bb, monster));
     }
 
     @Test
@@ -67,7 +68,7 @@ public class MonsterReadTest {
         assertEquals(this.monster.inventory(4), Monster.getInventory(bb, monster, 4));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IndexOutOfBoundsException.class)
     public void testGetInventoryOutOfBounds() throws Exception {
         int monster = Monster.getMonsterFromRoot(bb);
         Monster.getInventory(bb, monster, 5);

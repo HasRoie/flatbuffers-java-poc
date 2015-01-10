@@ -23,7 +23,7 @@ public class Vector {
         // Make sure index is not out of bounds
         int numElements = buffer.getInt(address);
         if (index >= numElements)
-            throw new IllegalArgumentException("Vector index is out of bounds.");
+            throw new IndexOutOfBoundsException();
 
         // Data starts directly after the size header, in contiguous memory
         return address + Utilities.SIZEOF_INT + index * elementSize;

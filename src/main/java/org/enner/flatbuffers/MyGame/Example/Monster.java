@@ -1,9 +1,6 @@
 package org.enner.flatbuffers.MyGame.Example;
 
-import org.enner.flatbuffers.Pointer;
-import org.enner.flatbuffers.Table;
-import org.enner.flatbuffers.Utilities;
-import org.enner.flatbuffers.Vector;
+import org.enner.flatbuffers.*;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -43,7 +40,11 @@ public class Monster {
     }
 
     public static String getName(ByteBuffer bb, int monster) {
-        return null;
+        int offset = 10;
+        String defaultValue = null;
+        int pointer = Table.getElementAddress(bb, monster, offset);
+        int string = Pointer.dereference(bb, pointer);
+        return FlatString.createString(bb, string, defaultValue);
     }
 
     public static int getInventoryLength(ByteBuffer bb, int monster) {
