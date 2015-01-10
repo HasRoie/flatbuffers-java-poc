@@ -61,7 +61,8 @@ public class MonsterReadTest {
 
     @Test
     public void testGetInventoryLength() throws Exception {
-
+        int monster = Monster.getMonsterFromRoot(bb);
+        assertEquals(this.monster.inventoryLength(), Monster.getInventoryLength(bb, monster));
     }
 
     @Test

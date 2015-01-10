@@ -20,9 +20,9 @@ public class Monster {
     }
 
     public static short getHp(ByteBuffer bb, int monster) {
-        int entryOffset = 8;
+        int offset = 8;
         short defaultValue = 100;
-        return Table.getShortValue(bb, monster, entryOffset, defaultValue);
+        return Table.getShortValue(bb, monster, offset, defaultValue);
     }
 
     public static int getPos(ByteBuffer bb, int monster) {
@@ -30,9 +30,9 @@ public class Monster {
     }
 
     public static short getMana(ByteBuffer bb, int monster) {
-        int entryOffset = 6;
+        int offset = 6;
         short defaultValue = 150;
-        return Table.getShortValue(bb, monster, entryOffset, defaultValue);
+        return Table.getShortValue(bb, monster, offset, defaultValue);
     }
 
     public static String getName(ByteBuffer bb, int monster) {
@@ -44,7 +44,8 @@ public class Monster {
     }
 
     public static int getInventoryLength(ByteBuffer bb, int monster) {
-        return 0;
+        int offset = 14;
+        return Table.getVectorLength(bb, monster, offset);
     }
 
     public static byte getInventory(ByteBuffer bb, int monster, int i) {

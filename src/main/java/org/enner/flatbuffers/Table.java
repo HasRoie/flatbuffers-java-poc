@@ -13,6 +13,18 @@ public class Table {
         return address == NULL ? defaultValue : bb.getShort(address);
     }
 
+    public static int getPointerValue(ByteBuffer bb, int tableAddress, int entryOffset) {
+        // Pointers are stored as ints relative to itself
+        int address = Table.getPointerToEntry(bb, tableAddress, entryOffset);
+        return address == NULL ? NULL : bb.getInt(address) + address;
+    }
+
+    public static int getVectorLength(ByteBuffer bb, int tableAddress, int entryOffset) {
+        // The length is the first int of a vector
+        int address = getPointerValue(bb, tableAddress, entryOffset);
+        return address == NULL ? 0 : bb.getInt(address);
+    }
+
     public static int NULL = 0;
 
     static int getVectorTableAddress(ByteBuffer bb, int tableAddress) {
