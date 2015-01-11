@@ -5,6 +5,8 @@ import org.enner.flatbuffers.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import static org.enner.flatbuffers.Utilities.*;
+
 /**
  * @author Florian Enner < florian @ hebirobotics.com >
  * @since 10 Jan 2015
@@ -22,7 +24,6 @@ public class Monster {
     public static short getHp(ByteBuffer bb, int monster) {
         int offset = 8;
         short defaultValue = 100;
-
         int address = Table.getElementAddress(bb, monster, offset);
         return Utilities.getShort(bb, address, defaultValue);
     }
@@ -72,6 +73,12 @@ public class Monster {
         return Color.getByValue(enumValue);
     }
 
+    public static int getEnemy(ByteBuffer bb, int monster) {
+        int offset = 28;
+        int pointer = Table.getElementAddress(bb, monster, offset);
+        return pointer == NULL ? NULL : Pointer.dereference(bb, pointer);
+    }
+
     public static String getTestArrayOfString(ByteBuffer bb, int monster, int index) {
         int offset = 24;
         String defaultValue = null;
@@ -88,4 +95,5 @@ public class Monster {
         int vector = Pointer.dereference(bb, pointer);
         return Vector.getLength(bb, vector);
     }
+
 }

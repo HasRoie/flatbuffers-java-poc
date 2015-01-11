@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import java.nio.ByteBuffer;
 
+import static org.enner.flatbuffers.Utilities.*;
 import static org.junit.Assert.*;
 
 public class MonsterReadTest {
@@ -87,6 +88,12 @@ public class MonsterReadTest {
     public void testGetColor() throws Exception {
         int monster = Monster.getMonsterFromRoot(bb);
         assertEquals(this.monster.color(), Monster.getColor(bb, monster).getValue());
+    }
+
+    @Test
+    public void testGetEnemy() throws Exception {
+        int monster = Monster.getMonsterFromRoot(bb);
+        assertEquals(this.monster.enemy() == null, Monster.getEnemy(bb, monster) == NULL);
     }
 
     @Test
