@@ -17,72 +17,72 @@ public class Monster {
         // First int is a pointer to the start of the object
         bb.order(ByteOrder.LITTLE_ENDIAN);
         int position = bb.position();
-        int offset = bb.getInt(position);
-        return position + offset;
+        int id = bb.getInt(position);
+        return position + id;
     }
 
     public static short getHp(ByteBuffer bb, int monster) {
-        int offset = 8;
+        int id = 2;
         short defaultValue = 100;
-        int address = Table.getElementAddress(bb, monster, offset);
+        int address = Table.getElementAddress(bb, monster, id);
         return Utilities.getShort(bb, address, defaultValue);
     }
 
     public static int getPos(ByteBuffer bb, int monster) {
-        int offset = 4;
-        return Table.getElementAddress(bb, monster, offset);
+        int id = 0;
+        return Table.getElementAddress(bb, monster, id);
     }
 
     public static short getMana(ByteBuffer bb, int monster) {
-        int offset = 6;
+        int id = 1;
         short defaultValue = 150;
-        int address = Table.getElementAddress(bb, monster, offset);
+        int address = Table.getElementAddress(bb, monster, id);
         return Utilities.getShort(bb, address, defaultValue);
     }
 
     public static String getName(ByteBuffer bb, int monster) {
-        int offset = 10;
+        int id = 3;
         String defaultValue = null;
-        int pointer = Table.getElementAddress(bb, monster, offset);
+        int pointer = Table.getElementAddress(bb, monster, id);
         int string = Pointer.dereference(bb, pointer);
         return FlatString.createString(bb, string, defaultValue);
     }
 
     public static int getInventoryLength(ByteBuffer bb, int monster) {
-        int offset = 14;
-        int pointer = Table.getElementAddress(bb, monster, offset);
+        int id = 5;
+        int pointer = Table.getElementAddress(bb, monster, id);
         int vector = Pointer.dereference(bb, pointer);
         return Vector.getLength(bb, vector);
     }
 
     public static byte getInventory(ByteBuffer bb, int monster, int index) {
-        int offset = 14;
+        int id = 5;
         int elementSize = 1;
         byte defaultValue = 0;
-        int pointer = Table.getElementAddress(bb, monster, offset);
+        int pointer = Table.getElementAddress(bb, monster, id);
         int vector = Pointer.dereference(bb, pointer);
         int address = Vector.getElementAddress(bb, vector, index, elementSize);
         return Utilities.getByte(bb, address, defaultValue);
     }
 
     public static Color getColor(ByteBuffer bb, int monster) {
-        int offset = 16;
+        int id = 6;
         byte defaultValue = 8;
-        int address = Table.getElementAddress(bb, monster, offset);
+        int address = Table.getElementAddress(bb, monster, id);
         byte enumValue = Utilities.getByte(bb, address, defaultValue);
         return Color.getByValue(enumValue);
     }
 
     public static int getEnemy(ByteBuffer bb, int monster) {
-        int offset = 28;
-        int pointer = Table.getElementAddress(bb, monster, offset);
+        int id = 12;
+        int pointer = Table.getElementAddress(bb, monster, id);
         return pointer == NULL ? NULL : Pointer.dereference(bb, pointer);
     }
 
     public static String getTestArrayOfString(ByteBuffer bb, int monster, int index) {
-        int offset = 24;
+        int id = 10;
         String defaultValue = null;
-        int vectorPointer = Table.getElementAddress(bb, monster, offset);
+        int vectorPointer = Table.getElementAddress(bb, monster, id);
         int vector = Pointer.dereference(bb, vectorPointer);
         int stringPointer = Vector.getElementAddress(bb, vector, index, 4);
         int address = Pointer.dereference(bb, stringPointer);
@@ -90,8 +90,8 @@ public class Monster {
     }
 
     public static int getTestArrayOfStringLength(ByteBuffer bb, int monster) {
-        int offset = 24;
-        int pointer = Table.getElementAddress(bb, monster, offset);
+        int id = 10;
+        int pointer = Table.getElementAddress(bb, monster, id);
         int vector = Pointer.dereference(bb, pointer);
         return Vector.getLength(bb, vector);
     }

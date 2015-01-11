@@ -20,57 +20,60 @@ public class Table {
      * Returns true if there exists an entry in the vector table. Note that this can
      * be ambiguous because implementations may omit default values during serialization.
      */
-    public static boolean hasElement(ByteBuffer bb, int tableAddress, int vtableOffset) {
-        return getElementOffset(bb, tableAddress, vtableOffset) != NULL;
+    public static boolean hasElement(ByteBuffer bb, int tableAddress, int fieldId) {
+        return getElementOffset(bb, tableAddress, fieldId) != NULL;
     }
 
     /**
      * Returns the absolute address of the pointer in the vector table. Returns 0 on failure
      */
-    public static int getElementAddress(ByteBuffer bb, int tableAddress, int vtableOffset) {
+    public static int getElementAddress(ByteBuffer bb, int tableAddress, int fieldId) {
         // Construct the absolute address based on the relative pointer. NULL means the value
         // doesn't exist. Note: The corner case where address+offset=NULL can't happen because
         // addresses and offsets are both unsigned and greater than 0.
-        int offset = Table.getElementOffset(bb, tableAddress, vtableOffset);
+        int offset = Table.getElementOffset(bb, tableAddress, fieldId);
         return offset == NULL ? NULL : tableAddress + offset;
     }
 
     /**
-     * Returns the relative offset of an element relative to the table address
+     * Returns the offset of an element relative to the table address
      */
-    private static int getElementOffset(ByteBuffer bb, int tableAddress, int entryOffset) {
+    private static int getElementOffset(ByteBuffer bb, int tableAddress, int fieldId) {
         // Jump to the vector table and extract the relative offset for this entry
+
+        // Find the start of the vector table
         int vtableAddress = Table.getVectorTableAddress(bb, tableAddress);
-        int offset = Table.getVectorTableOffset(bb, vtableAddress, entryOffset);
-        return offset;
+
+        // Check whether the field can exist. Older versions of the schema
+        // may have fewer fields. In this case always assume a NULL offset.
+        int numFields = getFieldCount(bb, vtableAddress);
+        if (fieldId >= numFields)
+            return NULL;
+
+        // Find the location in which the offset would be stored
+        int offsetFromVectorTable = SIZEOF_VECTOR_TABLE_HEADER + fieldId * SIZEOF_SHORT;
+        int elementOffset = unsigned(bb.getShort(vtableAddress + offsetFromVectorTable));
+        return elementOffset;
     }
 
     private static int getVectorTableAddress(ByteBuffer bb, int tableAddress) {
-        // Start of object holds the relative offset to its vtable
-        // Note that the offset is subtracted, not added
-        int vtableOffset = bb.getInt(tableAddress);
-        int vtableAddress = tableAddress - vtableOffset;
-        return vtableAddress;
+        // Start of object holds the relative offset to its vtable. The pointer
+        // is signed so that the vtable can be located anywhere. Note that for
+        // some reason the offset is subtracted instead of added.
+        int vectorTableAddress = tableAddress - bb.getInt(tableAddress);
+
+        // Fail if vector table doesn't exist. This should never happen if
+        // the element is initialized correctly.
+        checkAddressNotNull(vectorTableAddress);
+        return vectorTableAddress;
     }
 
-    private static int getVectorTableOffset(ByteBuffer bb, int vtAddress, int entryOffset) {
-        // If the vtable is not large enough, report that the entry isn't set. This
-        // is done for backwards compatibility reasons. "vtableLength - 1" is checked
-        // to prevent malicious input of odd offsets
-        int vtableLength = Table.getVectorTableSize(bb, vtAddress);
-        if (entryOffset >= (vtableLength - 1))
-            return NULL;
-
-        // Find the relative offset (to the table start) of the chosen entry
-        int addressOffset = unsigned(bb.getShort(vtAddress + entryOffset));
-        return addressOffset;
-    }
-
-    private static int getVectorTableSize(ByteBuffer bb, int vtAddress) {
-        // Read the length of vtable as the first short (needed
-        // for backwards compatibility in case fields got added)
-        int vtableLength = unsigned(bb.getShort(vtAddress));
-        return vtableLength;
+    private static int getFieldCount(ByteBuffer bb, int vtAddress) {
+        // The vector table stores its size (in bytes, including header)
+        // in the first 2 bytes as uint16
+        int vectorTableSize = unsigned(bb.getShort(vtAddress));
+        int numFields = (vectorTableSize - SIZEOF_VECTOR_TABLE_HEADER) / SIZEOF_SHORT;
+        return numFields;
     }
 
 }
