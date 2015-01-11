@@ -2,7 +2,7 @@ package org.enner.flatbuffers;
 
 import java.nio.ByteBuffer;
 
-import static org.enner.flatbuffers.Utilities.NULL;
+import static org.enner.flatbuffers.Utilities.*;
 
 /**
  * Pointers are uint32 that contain the address to an element. The
@@ -19,15 +19,17 @@ public class Pointer {
         // Read the offset. We could check for NULL, but the pointer
         // may be located at position 0.
         int offset = buffer.getInt(address);
-
-        // Make sure that it's unsigned. Note that it's not converted to long
-        // in case the protocol is changed to support signed values in the future.
-        if (offset < 0)
-            throw new IllegalStateException("Pointer offset is not allowed to be signed.");
+        checkPointerOffsetRange(offset);
 
         // We can use NULL is an invalid state. A NULL value would mean that the pointer
         // is simultaneously some other object, which is impossible.
         return offset == NULL ? NULL : address + offset;
+    }
+
+    public static void setReference(ByteBuffer buffer, int pointerAddress, int targetAddress) {
+        int offset = targetAddress - pointerAddress;
+        checkPointerOffsetRange(offset);
+        buffer.putInt(pointerAddress, offset);
     }
 
 }

@@ -12,11 +12,20 @@ import java.nio.ByteBuffer;
  */
 public class Utilities {
 
-    static final int SIZEOF_BYTE = Byte.BYTES;
-    static final int SIZEOF_SHORT = Short.BYTES;
-    static final int SIZEOF_INT = Integer.BYTES;
-    static final int FILE_IDENTIFIER_LENGTH = 4;
+    public static final int SIZEOF_BYTE = Byte.BYTES;
+    public static final int SIZEOF_SHORT = Short.BYTES;
+    public static final int SIZEOF_INT = Integer.BYTES;
+    public static final int SIZEOF_LONG = Long.BYTES;
+    public static final int FILE_IDENTIFIER_LENGTH = 4;
     public static int NULL = 0;
+
+    public static float getFloat(ByteBuffer bb, int address, float defaultValue) {
+        return address == NULL ? defaultValue : bb.getFloat(address);
+    }
+
+    public static double getDouble(ByteBuffer bb, int address, double defaultValue) {
+        return address == NULL ? defaultValue : bb.getDouble(address);
+    }
 
     /**
      * Bool / Byte / Enum
@@ -57,6 +66,20 @@ public class Utilities {
 
     public static long unsigned(int value) {
         return value & 0xFFFFFFFFL;
+    }
+
+    static int checkAddress(int address) {
+        if (address < 0)
+            throw new IllegalStateException("Absolute address can't be negative.");
+        return address;
+    }
+
+    static int checkPointerOffsetRange(int offset) {
+        // Make sure that it's unsigned. Note that it's not converted to long
+        // in case the protocol is changed to support signed values in the future.
+        if (offset < 0)
+            throw new IllegalStateException("Pointer offset is not allowed to be negative.");
+        return offset;
     }
 
 }
