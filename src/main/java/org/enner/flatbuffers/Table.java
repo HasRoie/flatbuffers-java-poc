@@ -48,7 +48,8 @@ public class Table {
         checkNotNegative(fieldId);
         ByteBuffer bb = checkNotNull(fbb.getBuffer());
 
-        // Make sure offset is within uint16 range
+        // Make sure that the offset is within the 65KB limit caused by using
+        // uint16 offsets
         int offset = address - tableAddress;
         checkNotNegative(offset);
         checkArgument(offset <= USHORT_MAX, "Address is outside the table's range of at most UINT16_MAX bytes");
@@ -60,8 +61,14 @@ public class Table {
         bb.putShort(vtableAddress + offsetFromVectorTable, (short) offset);
     }
 
-    public static int getPointerAddress(ByteBuffer bb, int tableAddress, int fieldId) {
-        return getValueTypeAddress(bb, tableAddress, fieldId);
+    public static void initPointer(FlatBufferBuilder fbb, int tableAddress, int fieldId){
+        // Set the address first in order to make sure that we don't allocate memory
+        // that we can't point to
+        if(!Table.hasField(fbb.getBuffer(), tableAddress, fieldId)){
+            int address = fbb.getNextAddress();
+            Table.setValueTypeAddress(fbb, tableAddress, fieldId, address);
+            fbb.addNullPointer();
+        }
     }
 
     /**
@@ -73,6 +80,9 @@ public class Table {
         return pointer == NULL ? NULL : Pointer.dereference(bb, pointer);
     }
 
+    private static int getPointerAddress(ByteBuffer bb, int tableAddress, int fieldId) {
+        return getValueTypeAddress(bb, tableAddress, fieldId);
+    }
 
     /**
      * Returns the offset of an element relative to the table address

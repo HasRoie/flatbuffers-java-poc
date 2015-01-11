@@ -35,6 +35,11 @@ public class FlatBufferBuilder {
         return buffer.position();
     }
 
+    public FlatBufferBuilder skip(int numBytes) {
+        buffer.position(buffer.position() + numBytes);
+        return this;
+    }
+
     public int addTable(int numElements) {
         // Build Header
         int address = getNextAddress();

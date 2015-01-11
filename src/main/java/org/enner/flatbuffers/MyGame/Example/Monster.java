@@ -22,9 +22,11 @@ public class Monster {
     final static int FIELD_POS = 0;
     final static int FIELD_HP = 2;
     final static int FIELD_NAME = 3;
+    final static int FIELD_INVENTORY = 5;
 
     final static short DEFAULT_HP = 100;
     final static String DEFAULT_NAME = null;
+    final static byte DEFAULT_INVENTORY = 0;
 
     public static short getHp(ByteBuffer bb, int monster) {
         int address = Table.getValueTypeAddress(bb, monster, FIELD_HP);
@@ -77,18 +79,12 @@ public class Monster {
         return FlatString.toJavaString(bb, string, DEFAULT_NAME);
     }
 
-    public static int initName(FlatBufferBuilder fbb, int monster) {
-        int address = Table.getPointerAddress(fbb.getBuffer(), monster, FIELD_NAME);
-        if (address == NULL) {
-            address = fbb.getNextAddress();
-            Table.setValueTypeAddress(fbb, monster, FIELD_NAME, address);
-            fbb.addNullPointer();
-        }
-        return address;
+    public static void initName(FlatBufferBuilder fbb, int monster) {
+        Table.initPointer(fbb, monster, FIELD_NAME);
     }
 
     public static int setName(FlatBufferBuilder fbb, int monster, int flatString) {
-          return 0;
+        return 0;
     }
 
     public static short getMana(ByteBuffer bb, int monster) {
@@ -99,18 +95,18 @@ public class Monster {
     }
 
     public static int getInventoryLength(ByteBuffer bb, int monster) {
-        int id = 5;
-        int vector = Table.getReferenceTypeAddress(bb, monster, id);
+        int vector = Table.getReferenceTypeAddress(bb, monster, FIELD_INVENTORY);
         return Vector.size(bb, vector);
     }
 
     public static byte getInventory(ByteBuffer bb, int monster, int index) {
-        int id = 5;
-        int elementSize = 1;
-        byte defaultValue = 0;
-        int vector = Table.getReferenceTypeAddress(bb, monster, id);
-        int address = Vector.getValueTypeAddress(bb, vector, index, elementSize);
-        return Utilities.getByte(bb, address, defaultValue);
+        int vector = Table.getReferenceTypeAddress(bb, monster, FIELD_INVENTORY);
+        int address = Vector.getValueTypeAddress(bb, vector, index, SIZEOF_BYTE);
+        return Utilities.getByte(bb, address, DEFAULT_INVENTORY);
+    }
+
+    public static void initInventory(FlatBufferBuilder fbb, int monster) {
+        Table.initPointer(fbb, monster, FIELD_INVENTORY);
     }
 
     public static Color getColor(ByteBuffer bb, int monster) {

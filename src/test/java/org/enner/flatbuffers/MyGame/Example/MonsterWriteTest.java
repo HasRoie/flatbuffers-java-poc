@@ -1,13 +1,11 @@
 package org.enner.flatbuffers.MyGame.Example;
 
 import org.enner.flatbuffers.FlatBufferBuilder;
-import org.enner.flatbuffers.FlatString;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
 
-import static org.enner.flatbuffers.Utilities.*;
 import static org.junit.Assert.*;
 
 public class MonsterWriteTest {
@@ -75,7 +73,7 @@ public class MonsterWriteTest {
     public void testSetName() throws Exception {
         int monster = createRootMonster();
         assertFalse(Monster.hasName(buffer, monster));
-        int pointer = Monster.initName(fbb, monster);
+        Monster.initName(fbb, monster);
         assertTrue(Monster.hasName(buffer, monster));
         assertEquals(null, Monster.getName(buffer, monster));
         // TODO: allocate string and write
@@ -83,6 +81,11 @@ public class MonsterWriteTest {
 
     @Test
     public void testSetInventory() throws Exception {
+        int monster = createRootMonster();
+
+
+//        assertEquals(0, Monster.getInventory(buffer, monster, 0));
+
 //        int monster = Monster.getMonsterFromRoot(buffer);
 //        int length = Monster.getInventoryLength(buffer, monster);
 //        assertEquals(this.monster.inventoryLength(), length);

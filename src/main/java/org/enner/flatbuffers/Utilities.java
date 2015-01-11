@@ -87,7 +87,7 @@ public class Utilities {
 
     public static int checkAddressNotNull(int address) {
         if (address == NULL)
-            throw new NullPointerException("FlatBuffer address");
+            throw new NullPointerException("FlatBuffer pointer has not been set");
         return address;
     }
 
