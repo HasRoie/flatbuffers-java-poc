@@ -1,6 +1,7 @@
 package org.enner.flatbuffers.MyGame.Example;
 
 import org.enner.flatbuffers.FlatBufferBuilder;
+import org.enner.flatbuffers.Vector;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -32,7 +33,7 @@ public class MonsterWriteTest {
     }
 
     @Test
-    public void testWriteMonsterToRoot() throws Exception {
+    public void testCreateRoot() throws Exception {
         int monster = createRootMonster();
         assertEquals(4, createRootMonster());
     }
@@ -82,44 +83,20 @@ public class MonsterWriteTest {
     @Test
     public void testSetInventory() throws Exception {
         int monster = createRootMonster();
+        int numElements = 5;
+        int elementSize = 1;
+        Monster.initInventory(fbb, monster);
+        int vector = fbb.addVector(numElements, elementSize);
+        Monster.setInventoryAddress(fbb, monster, vector);
 
 
-//        assertEquals(0, Monster.getInventory(buffer, monster, 0));
+        assertEquals(vector, Monster.getInventoryAddress(buffer, monster));
 
-//        int monster = Monster.getMonsterFromRoot(buffer);
-//        int length = Monster.getInventoryLength(buffer, monster);
-//        assertEquals(this.monster.inventoryLength(), length);
-//        for (int i = 0; i < length; i++) {
-//            assertEquals(this.monster.inventory(i), Monster.getInventory(buffer, monster, i));
-//        }
-    }
-
-//    @Test(expected = IndexOutOfBoundsException.class)
-//    public void testGetInventoryOutOfBounds() throws Exception {
-//        int monster = Monster.getMonsterFromRoot(buffer);
-//        Monster.getInventory(buffer, monster, 5);
-//    }
-
-    @Test
-    public void testGetColor() throws Exception {
-//        int monster = Monster.getMonsterFromRoot(buffer);
-//        assertEquals(this.monster.color(), Monster.getColor(buffer, monster).getValue());
-    }
-
-    @Test
-    public void testGetEnemy() throws Exception {
-//        int monster = Monster.getMonsterFromRoot(buffer);
-//        assertEquals(this.monster.enemy() == null, Monster.getEnemy(buffer, monster) == NULL);
-    }
-
-    @Test
-    public void testArrayOfStrings() throws Exception {
-//        int monster = Monster.getMonsterFromRoot(buffer);
-//        int length = Monster.getTestArrayOfStringLength(buffer, monster);
-//        assertEquals(this.monster.testarrayofstringLength(), length);
-//        for (int i = 0; i < length; i++) {
-//            assertEquals(this.monster.testarrayofstring(i), Monster.getTestArrayOfString(buffer, monster, i));
-//        }
+        for (int i = 0; i < numElements; i++) {
+            int address = Vector.getValueTypeAddress(buffer, vector, 0, elementSize);
+            buffer.put(address, (byte) i);
+            assertEquals(i, Monster.getInventory(buffer, monster, i));
+        }
     }
 
 }

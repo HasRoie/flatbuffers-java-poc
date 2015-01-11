@@ -105,8 +105,16 @@ public class Monster {
         return Utilities.getByte(bb, address, DEFAULT_INVENTORY);
     }
 
+    public static int getInventoryAddress(ByteBuffer buffer, int monster) {
+        return Table.getReferenceTypeAddress(buffer, monster, FIELD_INVENTORY);
+    }
+
     public static void initInventory(FlatBufferBuilder fbb, int monster) {
         Table.initReferencePointer(fbb, monster, FIELD_INVENTORY);
+    }
+
+    public static void setInventoryAddress(FlatBufferBuilder fbb, int monster, int inventory) {
+        Table.setReferenceTypeAddress(fbb, monster, FIELD_INVENTORY, inventory);
     }
 
     public static Color getColor(ByteBuffer bb, int monster) {
