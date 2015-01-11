@@ -11,8 +11,8 @@ import static org.enner.flatbuffers.Utilities.*;
  */
 public class FlatBufferBuilder {
 
-    public FlatBufferBuilder(ByteBuffer buffer) {
-        setBufferAndClear(buffer);
+    public static FlatBufferBuilder wrapAndClear(ByteBuffer buffer) {
+        return new FlatBufferBuilder(buffer);
     }
 
     public FlatBufferBuilder setBufferAndClear(ByteBuffer buffer) {
@@ -27,8 +27,12 @@ public class FlatBufferBuilder {
         return this;
     }
 
+    public int getRootAddress() {
+        return this.rootAddress;
+    }
+
     public int getNextAddress() {
-        return buffer.position() + 1;
+        return buffer.position();
     }
 
     public int addTable(int numElements) {
@@ -40,6 +44,12 @@ public class FlatBufferBuilder {
 
         // Zero vtable offsets in case there is garbage
         addZeros(numElements * SIZEOF_SHORT);
+        return address;
+    }
+
+    public int addStruct(int size) {
+        int address = getNextAddress();
+        buffer.position(buffer.position() + size);
         return address;
     }
 
@@ -77,6 +87,22 @@ public class FlatBufferBuilder {
 
     }
 
-    ByteBuffer buffer;
+    private FlatBufferBuilder(ByteBuffer buffer) {
+        setBufferAndClear(buffer);
+    }
 
+    ByteBuffer buffer;
+    int rootAddress = -1;
+
+    public FlatBufferBuilder createRootTable(int numFields) {
+        this.rootAddress = getNextAddress();
+        int pointer = addNullPointer();
+        int table = addTable(numFields);
+        Pointer.setReference(buffer, pointer, table);
+        return this;
+    }
+
+    public ByteBuffer getBuffer() {
+        return buffer;
+    }
 }

@@ -11,21 +11,6 @@ import java.nio.ByteBuffer;
  */
 public class JavaTest {
 
-    public static void main(String[] args) {
-
-        // Read data
-
-
-        // Create builder for some data
-        byte[] data = new byte[100];
-        ByteBuffer byteBuffer = ByteBuffer.wrap(data);
-        FlatBufferBuilder builder = new FlatBufferBuilder(byteBuffer);
-
-
-
-
-    }
-
     static void testBuffer(ByteBuffer bb) {
 
         int monster = Monster.getMonsterFromRoot(bb);

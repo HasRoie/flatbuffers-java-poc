@@ -21,6 +21,9 @@ public class Table {
      * be ambiguous because implementations may omit default values during serialization.
      */
     public static boolean hasField(ByteBuffer bb, int tableAddress, int fieldId) {
+        checkNotNull(bb);
+        checkNotNegative(tableAddress);
+        checkNotNegative(fieldId);
         return getFieldOffset(bb, tableAddress, fieldId) != NULL;
     }
 
@@ -32,8 +35,33 @@ public class Table {
         // Construct the absolute address based on the relative pointer. NULL means the value
         // doesn't exist. Note: The corner case where address+offset=NULL can't happen because
         // addresses and offsets are both unsigned and greater than 0.
+        checkNotNull(bb);
+        checkNotNegative(tableAddress);
+        checkNotNegative(fieldId);
         int offset = Table.getFieldOffset(bb, tableAddress, fieldId);
         return offset == NULL ? NULL : tableAddress + offset;
+    }
+
+    public static void setValueTypeAddress(FlatBufferBuilder fbb, int tableAddress, int fieldId, int address) {
+        checkNotNull(fbb);
+        checkNotNegative(tableAddress);
+        checkNotNegative(fieldId);
+        ByteBuffer bb = checkNotNull(fbb.getBuffer());
+
+        // Make sure offset is within uint16 range
+        int offset = address - tableAddress;
+        checkNotNegative(offset);
+        checkArgument(offset <= USHORT_MAX, "Address is outside the table's range of at most UINT16_MAX bytes");
+
+        // Update stored offset
+        int vtableAddress = Table.getVectorTableAddress(bb, tableAddress);
+        checkArgument(fieldId < getFieldCount(bb, vtableAddress));
+        int offsetFromVectorTable = SIZEOF_VECTOR_TABLE_HEADER + fieldId * SIZEOF_SHORT;
+        bb.putShort(vtableAddress + offsetFromVectorTable, (short) offset);
+    }
+
+    public static int getPointerAddress(ByteBuffer bb, int tableAddress, int fieldId) {
+        return getValueTypeAddress(bb, tableAddress, fieldId);
     }
 
     /**
@@ -41,16 +69,15 @@ public class Table {
      * NULL if field or reference have not been set
      */
     public static int getReferenceTypeAddress(ByteBuffer bb, int tableAddress, int fieldId) {
-        int pointer = getValueTypeAddress(bb, tableAddress, fieldId);
+        int pointer = getPointerAddress(bb, tableAddress, fieldId);
         return pointer == NULL ? NULL : Pointer.dereference(bb, pointer);
     }
+
 
     /**
      * Returns the offset of an element relative to the table address
      */
     private static int getFieldOffset(ByteBuffer bb, int tableAddress, int fieldId) {
-        // Jump to the vector table and extract the relative offset for this entry
-
         // Find the start of the vector table
         int vtableAddress = Table.getVectorTableAddress(bb, tableAddress);
 
@@ -82,6 +109,12 @@ public class Table {
         int vectorTableSize = unsigned(bb.getShort(vtAddress));
         int numFields = (vectorTableSize - SIZEOF_VECTOR_TABLE_HEADER) / SIZEOF_SHORT;
         return numFields;
+    }
+
+    private static int getPayloadSize(ByteBuffer bb, int vtAddress) {
+        // Payload size is in the 2nd short of the header. Size is in bytes
+        // and includes the header itself.
+        return unsigned(bb.getShort(vtAddress + SIZEOF_SHORT));
     }
 
 }

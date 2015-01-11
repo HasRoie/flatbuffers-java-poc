@@ -25,11 +25,6 @@ public class MonsterReadTest {
         pos = monster.pos();
     }
 
-    @After
-    public void tearDown() throws Exception {
-
-    }
-
     @Test
     public void testGetMonsterFromRoot() throws Exception {
         assertEquals(48, Monster.getMonsterFromRoot(bb));

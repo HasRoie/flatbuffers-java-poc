@@ -21,7 +21,7 @@ public class FlatString {
      * This allocates a new string and converts to wide chars upon each access,
      * which is not very efficient.
      */
-    public static String createString(ByteBuffer buffer, int address, String defaultValue) {
+    public static String toJavaString(ByteBuffer buffer, int address, String defaultValue) {
         if (address == NULL)
             return defaultValue;
 

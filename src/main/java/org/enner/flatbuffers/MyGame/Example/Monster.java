@@ -1,12 +1,11 @@
 package org.enner.flatbuffers.MyGame.Example;
 
-import org.enner.flatbuffers.FlatString;
-import org.enner.flatbuffers.Table;
-import org.enner.flatbuffers.Utilities;
-import org.enner.flatbuffers.Vector;
+import org.enner.flatbuffers.*;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+
+import static org.enner.flatbuffers.Utilities.*;
 
 /**
  * @author Florian Enner < florian @ hebirobotics.com >
@@ -17,21 +16,79 @@ public class Monster {
     public static int getMonsterFromRoot(ByteBuffer bb) {
         // First int is a pointer to the start of the object
         bb.order(ByteOrder.LITTLE_ENDIAN);
-        int position = bb.position();
-        int id = bb.getInt(position);
-        return position + id;
+        return Pointer.dereference(bb, bb.position());
     }
 
+    final static int FIELD_POS = 0;
+    final static int FIELD_HP = 2;
+    final static int FIELD_NAME = 3;
+
+    final static short DEFAULT_HP = 100;
+    final static String DEFAULT_NAME = null;
+
     public static short getHp(ByteBuffer bb, int monster) {
-        int id = 2;
-        short defaultValue = 100;
-        int address = Table.getValueTypeAddress(bb, monster, id);
-        return Utilities.getShort(bb, address, defaultValue);
+        int address = Table.getValueTypeAddress(bb, monster, FIELD_HP);
+        return Utilities.getShort(bb, address, DEFAULT_HP);
+    }
+
+    public static boolean hasHp(ByteBuffer buffer, int monster) {
+        return Table.hasField(buffer, monster, FIELD_HP);
+    }
+
+    public static int setHp(FlatBufferBuilder fbb, int monster, short hp) {
+        int address = Table.getValueTypeAddress(fbb.getBuffer(), monster, FIELD_HP);
+        if (address != NULL) {
+            fbb.getBuffer().putShort(address, hp);
+        } else {
+            address = fbb.getNextAddress();
+            fbb.getBuffer().putShort(hp);
+            Table.setValueTypeAddress(fbb, monster, FIELD_HP, address);
+        }
+        return address;
     }
 
     public static int getPos(ByteBuffer bb, int monster) {
-        int id = 0;
-        return Table.getValueTypeAddress(bb, monster, id);
+        return Table.getValueTypeAddress(bb, monster, FIELD_POS);
+    }
+
+    public static boolean hasPos(ByteBuffer bb, int monster) {
+        return Table.hasField(bb, monster, FIELD_POS);
+    }
+
+    public static int getPosBuilder(FlatBufferBuilder fbb, int monster) {
+        // Existing pos can be overwritten to save
+        int address = Table.getValueTypeAddress(fbb.getBuffer(), monster, FIELD_POS);
+        if (address == NULL) {
+            // We set the pointer first in order to make sure that we don't
+            // allocate a struct that is outside the 65KB range.
+            address = fbb.getNextAddress();
+            Table.setValueTypeAddress(fbb, monster, FIELD_POS, address);
+            fbb.addStruct(Vec3.size());
+        }
+        return address;
+    }
+
+    public static boolean hasName(ByteBuffer bb, int monster) {
+        return Table.hasField(bb, monster, FIELD_NAME);
+    }
+
+    public static String getName(ByteBuffer bb, int monster) {
+        int string = Table.getReferenceTypeAddress(bb, monster, FIELD_NAME);
+        return FlatString.toJavaString(bb, string, DEFAULT_NAME);
+    }
+
+    public static int initName(FlatBufferBuilder fbb, int monster) {
+        int address = Table.getPointerAddress(fbb.getBuffer(), monster, FIELD_NAME);
+        if (address == NULL) {
+            address = fbb.getNextAddress();
+            Table.setValueTypeAddress(fbb, monster, FIELD_NAME, address);
+            fbb.addNullPointer();
+        }
+        return address;
+    }
+
+    public static int setName(FlatBufferBuilder fbb, int monster, int flatString) {
+          return 0;
     }
 
     public static short getMana(ByteBuffer bb, int monster) {
@@ -39,13 +96,6 @@ public class Monster {
         short defaultValue = 150;
         int address = Table.getValueTypeAddress(bb, monster, id);
         return Utilities.getShort(bb, address, defaultValue);
-    }
-
-    public static String getName(ByteBuffer bb, int monster) {
-        int id = 3;
-        String defaultValue = null;
-        int string = Table.getReferenceTypeAddress(bb, monster, id);
-        return FlatString.createString(bb, string, defaultValue);
     }
 
     public static int getInventoryLength(ByteBuffer bb, int monster) {
@@ -81,7 +131,7 @@ public class Monster {
         String defaultValue = null;
         int vector = Table.getReferenceTypeAddress(bb, monster, id);
         int string = Vector.getReferenceTypeAddress(bb, vector, index);
-        return FlatString.createString(bb, string, defaultValue);
+        return FlatString.toJavaString(bb, string, defaultValue);
     }
 
     public static int getTestArrayOfStringLength(ByteBuffer bb, int monster) {
