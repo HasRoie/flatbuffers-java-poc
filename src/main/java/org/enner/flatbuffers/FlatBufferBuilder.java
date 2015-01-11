@@ -35,7 +35,7 @@ public class FlatBufferBuilder {
         // Build Header
         int address = getNextAddress();
         buffer.putInt(-SIZEOF_INT); // table start with negative offset to its vtable
-        buffer.putShort((short) ((numElements + 2) * SIZEOF_SHORT)); // 2x uint16 headers
+        buffer.putShort((short) (SIZEOF_VECTOR_TABLE_HEADER + numElements * SIZEOF_SHORT));
         buffer.putShort((short) 0); // ignore payload-length field
 
         // Zero vtable offsets in case there is garbage

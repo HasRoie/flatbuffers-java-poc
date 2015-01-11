@@ -32,7 +32,7 @@ public class Vector {
             throw new IndexOutOfBoundsException();
 
         // Data starts directly after the size header, in contiguous memory
-        return address + SIZEOF_INT + index * elementSize;
+        return address + SIZEOF_VECTOR_HEADER + index * elementSize;
     }
 
 }
