@@ -18,13 +18,18 @@ public class Vector {
         return address == NULL ? 0 : buffer.getInt(address);
     }
 
-    public static int getFirstElementAddress(ByteBuffer buffer,  int address){
-        return getElementAddress(buffer, address, 0, 0);
+    public static int getFirstElementAddress(ByteBuffer buffer, int address) {
+        return getValueTypeAddress(buffer, address, 0, 0);
     }
 
-    public static int getElementAddress(ByteBuffer buffer, int address, int index, int elementSize) {
-        if (address == NULL)
-            return NULL;
+    /**
+     * Returns the address of a stored value type (byte / short / int / struct / etc.)
+     */
+    public static int getValueTypeAddress(ByteBuffer buffer, int address, int index, int elementSize) {
+        // Vector can't be stored in the beginning of the buffer
+        checkAddressNotNull(address);
+        checkNotNegative(index);
+        checkNotNegative(elementSize);
 
         // Make sure index is not out of bounds
         int numElements = buffer.getInt(address);
@@ -33,6 +38,15 @@ public class Vector {
 
         // Data starts directly after the size header, in contiguous memory
         return address + SIZEOF_VECTOR_HEADER + index * elementSize;
+    }
+
+    /**
+     * Returns the address of a stored reference type (String / Vector / Table)
+     * NULL if reference has not been set
+     */
+    public static int getReferenceTypeAddress(ByteBuffer buffer, int address, int index) {
+        int pointer = getValueTypeAddress(buffer, address, index, SIZEOF_POINTER);
+        return pointer == NULL ? NULL : Pointer.dereference(buffer, pointer);
     }
 
 }
