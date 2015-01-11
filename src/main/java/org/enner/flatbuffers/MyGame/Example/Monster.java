@@ -72,4 +72,20 @@ public class Monster {
         return Color.getByValue(enumValue);
     }
 
+    public static String getTestArrayOfString(ByteBuffer bb, int monster, int index) {
+        int offset = 24;
+        String defaultValue = null;
+        int vectorPointer = Table.getElementAddress(bb, monster, offset);
+        int vector = Pointer.dereference(bb, vectorPointer);
+        int stringPointer = Vector.getElementAddress(bb, vector, index, 4);
+        int address = Pointer.dereference(bb, stringPointer);
+        return FlatString.createString(bb, address, defaultValue);
+    }
+
+    public static int getTestArrayOfStringLength(ByteBuffer bb, int monster) {
+        int offset = 24;
+        int pointer = Table.getElementAddress(bb, monster, offset);
+        int vector = Pointer.dereference(bb, pointer);
+        return Vector.getLength(bb, vector);
+    }
 }

@@ -64,8 +64,11 @@ public class MonsterReadTest {
     @Test
     public void testGetInventory() throws Exception {
         int monster = Monster.getMonsterFromRoot(bb);
-        assertEquals(this.monster.inventory(0), Monster.getInventory(bb, monster, 0));
-        assertEquals(this.monster.inventory(4), Monster.getInventory(bb, monster, 4));
+        int length = Monster.getInventoryLength(bb, monster);
+        assertEquals(this.monster.inventoryLength(), length);
+        for (int i = 0; i < length; i++) {
+            assertEquals(this.monster.inventory(i), Monster.getInventory(bb, monster, i));
+        }
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
@@ -84,6 +87,16 @@ public class MonsterReadTest {
     public void testGetColor() throws Exception {
         int monster = Monster.getMonsterFromRoot(bb);
         assertEquals(this.monster.color(), Monster.getColor(bb, monster).getValue());
+    }
+
+    @Test
+    public void testArrayOfStrings() throws Exception {
+        int monster = Monster.getMonsterFromRoot(bb);
+        int length = Monster.getTestArrayOfStringLength(bb, monster);
+        assertEquals(this.monster.testarrayofstringLength(), length);
+        for (int i = 0; i < length; i++) {
+            assertEquals(this.monster.testarrayofstring(i), Monster.getTestArrayOfString(bb, monster, i));
+        }
     }
 
 }
