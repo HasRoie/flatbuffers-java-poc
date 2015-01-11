@@ -24,7 +24,7 @@ public class Table {
         checkNotNull(bb);
         checkNotNegative(tableAddress);
         checkNotNegative(fieldId);
-        return getFieldOffset(bb, tableAddress, fieldId) != NULL;
+        return getFieldAddress(bb, tableAddress, fieldId) != NULL;
     }
 
     /**
@@ -38,8 +38,7 @@ public class Table {
         checkNotNull(bb);
         checkNotNegative(tableAddress);
         checkNotNegative(fieldId);
-        int offset = Table.getFieldOffset(bb, tableAddress, fieldId);
-        return offset == NULL ? NULL : tableAddress + offset;
+        return getFieldAddress(bb, tableAddress, fieldId);
     }
 
     public static void setValueTypeAddress(FlatBufferBuilder fbb, int tableAddress, int fieldId, int address) {
@@ -48,17 +47,11 @@ public class Table {
         checkNotNegative(fieldId);
         ByteBuffer bb = checkNotNull(fbb.getBuffer());
 
-        // Make sure that the offset is within the 65KB limit caused by using
-        // uint16 offsets
-        int offset = address - tableAddress;
-        checkNotNegative(offset);
-        checkArgument(offset <= USHORT_MAX, "Address is outside the table's range of at most UINT16_MAX bytes");
-
-        // Update stored offset
-        int vtableAddress = Table.getVectorTableAddress(bb, tableAddress);
-        checkArgument(fieldId < getFieldCount(bb, vtableAddress));
+        int vtableAddress = Pointer.dereferenceSigned32(bb, tableAddress);
+        checkArgument(fieldId < getFieldCount(bb, vtableAddress), "Field id is too large.");
         int offsetFromVectorTable = SIZEOF_VECTOR_TABLE_HEADER + fieldId * SIZEOF_SHORT;
-        bb.putShort(vtableAddress + offsetFromVectorTable, (short) offset);
+        int pointer = vtableAddress + offsetFromVectorTable;
+        Pointer.setUnsigned16Reference(fbb.getBuffer(), pointer, address, tableAddress);
     }
 
     /**
@@ -117,9 +110,10 @@ public class Table {
     /**
      * Returns the offset of an element relative to the table address
      */
-    private static int getFieldOffset(ByteBuffer bb, int tableAddress, int fieldId) {
+    private static int getFieldAddress(ByteBuffer bb, int tableAddress, int fieldId) {
+
         // Find the start of the vector table
-        int vtableAddress = Table.getVectorTableAddress(bb, tableAddress);
+        int vtableAddress = Pointer.dereferenceSigned32(bb, tableAddress);
 
         // Check whether the field can exist. Older versions of the schema
         // may have fewer fields. In this case always assume a NULL offset.
@@ -129,18 +123,8 @@ public class Table {
 
         // Find the location in which the offset would be stored
         int offsetFromVectorTable = SIZEOF_VECTOR_TABLE_HEADER + fieldId * SIZEOF_SHORT;
-        int fieldOffset = unsigned(bb.getShort(vtableAddress + offsetFromVectorTable));
-        return fieldOffset;
-    }
-
-    private static int getVectorTableAddress(ByteBuffer bb, int tableAddress) {
-        // Start of object holds the relative offset to its vtable. The pointer
-        // is signed so that the vtable can be located anywhere. Note that for
-        // some reason the offset is subtracted instead of added. Since the
-        // vtable can technically be located at the beginning, we can't do
-        // a null check
-        int vectorTableAddress = tableAddress - bb.getInt(tableAddress);
-        return vectorTableAddress;
+        int pointer = vtableAddress + offsetFromVectorTable;
+        return Pointer.dereferenceUnsigned16(bb, pointer, tableAddress);
     }
 
     private static int getFieldCount(ByteBuffer bb, int vtAddress) {

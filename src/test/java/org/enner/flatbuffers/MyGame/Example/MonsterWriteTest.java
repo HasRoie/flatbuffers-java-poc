@@ -88,12 +88,10 @@ public class MonsterWriteTest {
         Monster.initInventory(fbb, monster);
         int vector = fbb.addVector(numElements, elementSize);
         Monster.setInventoryAddress(fbb, monster, vector);
-
-
         assertEquals(vector, Monster.getInventoryAddress(buffer, monster));
 
         for (int i = 0; i < numElements; i++) {
-            int address = Vector.getValueTypeAddress(buffer, vector, 0, elementSize);
+            int address = Vector.getValueTypeAddress(buffer, vector, i, elementSize);
             buffer.put(address, (byte) i);
             assertEquals(i, Monster.getInventory(buffer, monster, i));
         }
