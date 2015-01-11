@@ -68,12 +68,24 @@ public class Utilities {
         return value & 0xFFFFFFFFL;
     }
 
-    static int checkNotNegative(int value) {
+    public static int checkNotNegative(int value) {
         // Make sure that it's unsigned. Note that it's not converted to long
         // in case the protocol is changed to support signed values in the future.
         if (value < 0)
             throw new IllegalStateException("Value is not allowed to be negative.");
         return value;
+    }
+
+    public static int checkAddressNotNull(int address) {
+        if (address == NULL)
+            throw new NullPointerException("FlatBuffer address");
+        return address;
+    }
+
+    public static <T> T checkNotNull(T object) {
+        if (object == null)
+            throw new NullPointerException();
+        return object;
     }
 
 }
