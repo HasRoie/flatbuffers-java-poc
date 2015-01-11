@@ -68,18 +68,12 @@ public class Utilities {
         return value & 0xFFFFFFFFL;
     }
 
-    static int checkAddress(int address) {
-        if (address < 0)
-            throw new IllegalStateException("Absolute address can't be negative.");
-        return address;
-    }
-
-    static int checkPointerOffsetRange(int offset) {
+    static int checkNotNegative(int value) {
         // Make sure that it's unsigned. Note that it's not converted to long
         // in case the protocol is changed to support signed values in the future.
-        if (offset < 0)
-            throw new IllegalStateException("Pointer offset is not allowed to be negative.");
-        return offset;
+        if (value < 0)
+            throw new IllegalStateException("Value is not allowed to be negative.");
+        return value;
     }
 
 }

@@ -19,7 +19,7 @@ public class Pointer {
         // Read the offset. We could check for NULL, but the pointer
         // may be located at position 0.
         int offset = buffer.getInt(address);
-        checkPointerOffsetRange(offset);
+        checkNotNegative(offset);
 
         // We can use NULL is an invalid state. A NULL value would mean that the pointer
         // is simultaneously some other object, which is impossible.
@@ -28,7 +28,7 @@ public class Pointer {
 
     public static void setReference(ByteBuffer buffer, int pointerAddress, int targetAddress) {
         int offset = targetAddress - pointerAddress;
-        checkPointerOffsetRange(offset);
+        checkNotNegative(offset);
         buffer.putInt(pointerAddress, offset);
     }
 
