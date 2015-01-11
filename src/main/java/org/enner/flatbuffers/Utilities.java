@@ -12,6 +12,7 @@ import java.nio.ByteBuffer;
  */
 public class Utilities {
 
+    static final int SIZEOF_BYTE = Byte.BYTES;
     static final int SIZEOF_SHORT = Short.BYTES;
     static final int SIZEOF_INT = Integer.BYTES;
     static final int FILE_IDENTIFIER_LENGTH = 4;

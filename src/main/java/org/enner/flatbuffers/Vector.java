@@ -16,6 +16,10 @@ public class Vector {
         return address == Utilities.NULL ? 0 : buffer.getInt(address);
     }
 
+    public static int getFirstElementAddress(ByteBuffer buffer,  int address){
+        return getElementAddress(buffer, address, 0, 0);
+    }
+
     public static int getElementAddress(ByteBuffer buffer, int address, int index, int elementSize) {
         if (address == Utilities.NULL)
             return Utilities.NULL;
