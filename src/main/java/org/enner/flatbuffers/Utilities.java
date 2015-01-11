@@ -107,4 +107,15 @@ public class Utilities {
             throw new IllegalArgumentException(error);
     }
 
+    public static void checkState(boolean expression) {
+        if (!expression)
+            throw new IllegalStateException();
+    }
+
+    public static void checkState(boolean expression, String error) {
+        if (!expression)
+            throw new IllegalStateException(error);
+    }
+
+
 }

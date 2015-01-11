@@ -80,7 +80,7 @@ public class Monster {
     }
 
     public static void initName(FlatBufferBuilder fbb, int monster) {
-        Table.initPointer(fbb, monster, FIELD_NAME);
+        Table.initReferencePointer(fbb, monster, FIELD_NAME);
     }
 
     public static int setName(FlatBufferBuilder fbb, int monster, int flatString) {
@@ -106,7 +106,7 @@ public class Monster {
     }
 
     public static void initInventory(FlatBufferBuilder fbb, int monster) {
-        Table.initPointer(fbb, monster, FIELD_INVENTORY);
+        Table.initReferencePointer(fbb, monster, FIELD_INVENTORY);
     }
 
     public static Color getColor(ByteBuffer bb, int monster) {

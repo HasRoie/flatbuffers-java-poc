@@ -40,15 +40,21 @@ public class FlatBufferBuilder {
         return this;
     }
 
-    public int addTable(int numElements) {
-        // Build Header
+    public FlatBufferBuilder skipAndFillWithZeros(int numBytes, boolean setAllZeros) {
         int address = getNextAddress();
-        buffer.putInt(-SIZEOF_INT); // table start with negative offset to its vtable
+        skip(numBytes);
+        if (setAllZeros)
+            setZeros(address, numBytes);
+        return this;
+    }
+
+    public int addTable(int numElements) {
+        // Build header and a zeroed vector table
+        int address = getNextAddress();
+        buffer.putInt(-SIZEOF_INT); // table header contains negative offset to its vtable
         buffer.putShort((short) (SIZEOF_VECTOR_TABLE_HEADER + numElements * SIZEOF_SHORT));
         buffer.putShort((short) 0); // ignore payload-length field. It doesn't mean much if payload is not contiguous
-
-        // Zero vtable offsets in case there is garbage
-        addZeros(numElements * SIZEOF_SHORT);
+        skipAndFillWithZeros(numElements * SIZEOF_SHORT, true); // zero offsets to avoid issues with garbage
         return address;
     }
 
@@ -69,24 +75,33 @@ public class FlatBufferBuilder {
         int address = getNextAddress();
         buffer.putInt(numElements);
 
-        // Zero the buffer in case there is garbage
-        addZeros(numElements * elementSize);
+        // Skip elements without zeroing memory. This may
+        // result in garbage pointers, but it would be too
+        // expensive for large vectors of structs.
+        skip(numElements * elementSize);
         return address;
     }
 
-    public void addZeros(int count) {
-        int remaining = count;
+    public void setZeros(int address, int length) {
+        int remaining = length;
 
         // Try to write in 8 byte chunks to lower
         //number of calls
         while (remaining >= SIZEOF_LONG) {
-            buffer.putLong(0);
+            buffer.putLong(address + remaining, 0);
             remaining -= SIZEOF_LONG;
+        }
+
+        // Do 4 byte as well. It may not be worth it,
+        // but pointers etc. get set quite often.
+        while (remaining >= SIZEOF_INT) {
+            buffer.putInt(address + remaining, 0);
+            remaining -= SIZEOF_INT;
         }
 
         // Do the rest individually
         while (remaining > 0) {
-            buffer.put((byte) 0);
+            buffer.put(address + remaining, (byte) 0);
             remaining -= SIZEOF_BYTE;
         }
 

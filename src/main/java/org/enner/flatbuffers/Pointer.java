@@ -28,7 +28,7 @@ public class Pointer {
 
     public static void setReference(ByteBuffer buffer, int pointerAddress, int targetAddress) {
         int offset = targetAddress - pointerAddress;
-        checkNotNegative(offset);
+        checkArgument(offset >= 0, "Pointer can't be negative. Make sure to initialize it first");
         buffer.putInt(pointerAddress, offset);
     }
 

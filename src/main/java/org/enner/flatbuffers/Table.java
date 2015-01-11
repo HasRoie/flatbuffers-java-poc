@@ -43,7 +43,7 @@ public class Table {
     }
 
     public static void setValueTypeAddress(FlatBufferBuilder fbb, int tableAddress, int fieldId, int address) {
-        checkNotNull(fbb);
+        checkNotNull(checkNotNull(fbb).getBuffer());
         checkNotNegative(tableAddress);
         checkNotNegative(fieldId);
         ByteBuffer bb = checkNotNull(fbb.getBuffer());
@@ -61,16 +61,6 @@ public class Table {
         bb.putShort(vtableAddress + offsetFromVectorTable, (short) offset);
     }
 
-    public static void initPointer(FlatBufferBuilder fbb, int tableAddress, int fieldId){
-        // Set the address first in order to make sure that we don't allocate memory
-        // that we can't point to
-        if(!Table.hasField(fbb.getBuffer(), tableAddress, fieldId)){
-            int address = fbb.getNextAddress();
-            Table.setValueTypeAddress(fbb, tableAddress, fieldId, address);
-            fbb.addNullPointer();
-        }
-    }
-
     /**
      * Returns the address of a stored reference type (String / Vector / Table)
      * NULL if field or reference have not been set
@@ -80,8 +70,48 @@ public class Table {
         return pointer == NULL ? NULL : Pointer.dereference(bb, pointer);
     }
 
+    public static void setReferenceTypeAddress(FlatBufferBuilder fbb, int tableAddress, int fieldId, int target) {
+        ByteBuffer buffer = checkNotNull(fbb).getBuffer();
+        int pointer = getPointerAddress(buffer, tableAddress, fieldId);
+        checkState(pointer != NULL, "Pointer must be initialized before setting an address");
+        Pointer.setReference(buffer, pointer, target);
+    }
+
     private static int getPointerAddress(ByteBuffer bb, int tableAddress, int fieldId) {
         return getValueTypeAddress(bb, tableAddress, fieldId);
+    }
+
+    private static int initValueType(FlatBufferBuilder fbb, int table, int fieldId, int size, boolean fillWithZeros) {
+        ByteBuffer buffer = checkNotNull(checkNotNull(fbb).getBuffer());
+        checkNotNegative(table);
+        checkNotNegative(fieldId);
+        // Do nothing if data has already been initialized
+        int address = Table.getValueTypeAddress(buffer, table, fieldId);
+        if (address == NULL) {
+            // Set the address first in order to make sure that we don't allocate memory
+            // that we can't point to
+            address = fbb.getNextAddress();
+            Table.setValueTypeAddress(fbb, table, fieldId, address);
+            fbb.skipAndFillWithZeros(size, fillWithZeros);
+        }
+        return address;
+    }
+
+    /**
+     * Makes sure that a pointer object exists. If the pointer already exists, then nothing happens.
+     * This is useful for
+     *
+     * @return address of pointer. The pointer gets initialized as NULL
+     */
+    public static int initReferencePointer(FlatBufferBuilder fbb, int tableAddress, int fieldId) {
+        return initValueType(fbb, tableAddress, fieldId, SIZEOF_POINTER, true);
+    }
+
+    /**
+     * @return start address of value. Note that the space may contain garbage.
+     */
+    public static int initValueType(FlatBufferBuilder fbb, int table, int fieldId, int size) {
+        return initValueType(fbb, table, fieldId, size, false);
     }
 
     /**
