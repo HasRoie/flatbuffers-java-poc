@@ -13,13 +13,18 @@ import static org.enner.flatbuffers.Utilities.*;
  */
 public class Vector {
 
-    public static int getLength(ByteBuffer buffer, int address) {
-        // Length field is located at the beginning
-        return address == NULL ? 0 : buffer.getInt(address);
+    /**
+     * @return element count
+     */
+    public static int size(ByteBuffer buffer, int address) {
+        checkAddressNotNull(address);
+        int elementCount = buffer.getInt(address);
+        return elementCount;
     }
 
     public static int getFirstElementAddress(ByteBuffer buffer, int address) {
-        return getValueTypeAddress(buffer, address, 0, 0);
+        checkAddressNotNull(address);
+        return address + SIZEOF_VECTOR_HEADER;
     }
 
     /**
@@ -32,7 +37,7 @@ public class Vector {
         checkNotNegative(elementSize);
 
         // Make sure index is not out of bounds
-        int numElements = buffer.getInt(address);
+        int numElements = size(buffer, address);
         if (index >= numElements)
             throw new IndexOutOfBoundsException();
 

@@ -51,7 +51,7 @@ public class Monster {
     public static int getInventoryLength(ByteBuffer bb, int monster) {
         int id = 5;
         int vector = Table.getReferenceTypeAddress(bb, monster, id);
-        return Vector.getLength(bb, vector);
+        return Vector.size(bb, vector);
     }
 
     public static byte getInventory(ByteBuffer bb, int monster, int index) {
@@ -87,7 +87,7 @@ public class Monster {
     public static int getTestArrayOfStringLength(ByteBuffer bb, int monster) {
         int id = 10;
         int vector = Table.getReferenceTypeAddress(bb, monster, id);
-        return Vector.getLength(bb, vector);
+        return Vector.size(bb, vector);
     }
 
 }

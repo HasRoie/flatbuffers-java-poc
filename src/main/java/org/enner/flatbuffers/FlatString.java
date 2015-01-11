@@ -26,7 +26,7 @@ public class FlatString {
             return defaultValue;
 
         int start = Vector.getFirstElementAddress(buffer, address);
-        int length = Vector.getLength(buffer, address);
+        int length = Vector.size(buffer, address);
 
         if (buffer.hasArray()) {
             return new String(buffer.array(), start, length, UTF_8);
