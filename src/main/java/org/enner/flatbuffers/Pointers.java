@@ -29,7 +29,7 @@ import static org.enner.flatbuffers.Utilities.*;
  * @author Florian Enner < florian @ hebirobotics.com >
  * @since 10 Jan 2015
  */
-public class Pointer {
+public class Pointers {
 
     public static int dereference(ByteBuffer buffer, int pointer) {
         // Read the offset. We could check for NULL, but the pointer

@@ -11,7 +11,7 @@ import static org.enner.flatbuffers.Utilities.*;
  * @author Florian Enner < florian @ hebirobotics.com >
  * @since 10 Jan 2015
  */
-public class Vector {
+public class Vectors {
 
     /**
      * @return element count
@@ -60,7 +60,7 @@ public class Vector {
         checkNotNegative(address);
         checkNotNegative(index);
         int pointer = getValueTypeAddress(buffer, address, index, SIZEOF_POINTER);
-        return pointer == NULL ? NULL : Pointer.dereference(buffer, pointer);
+        return pointer == NULL ? NULL : Pointers.dereference(buffer, pointer);
     }
 
 }

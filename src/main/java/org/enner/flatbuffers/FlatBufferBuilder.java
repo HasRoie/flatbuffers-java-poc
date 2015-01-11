@@ -40,11 +40,11 @@ public class FlatBufferBuilder {
         return this;
     }
 
-    public FlatBufferBuilder skipAndFillWithZeros(int numBytes, boolean setAllZeros) {
+    public FlatBufferBuilder skipAndFillWithZeros(int numBytes, boolean memsetZero) {
         int address = getNextAddress();
         skip(numBytes);
-        if (setAllZeros)
-            setZeros(address, numBytes);
+        if (memsetZero)
+            Builders.setZeros(buffer, address, numBytes);
         return this;
     }
 
@@ -82,31 +82,6 @@ public class FlatBufferBuilder {
         return address;
     }
 
-    public void setZeros(int address, int length) {
-        int remaining = length;
-
-        // Try to write in 8 byte chunks to lower
-        //number of calls
-        while (remaining >= SIZEOF_LONG) {
-            buffer.putLong(address + remaining, 0);
-            remaining -= SIZEOF_LONG;
-        }
-
-        // Do 4 byte as well. It may not be worth it,
-        // but pointers etc. get set quite often.
-        while (remaining >= SIZEOF_INT) {
-            buffer.putInt(address + remaining, 0);
-            remaining -= SIZEOF_INT;
-        }
-
-        // Do the rest individually
-        while (remaining > 0) {
-            buffer.put(address + remaining, (byte) 0);
-            remaining -= SIZEOF_BYTE;
-        }
-
-    }
-
     private FlatBufferBuilder(ByteBuffer buffer) {
         setBufferAndClear(buffer);
     }
@@ -118,7 +93,7 @@ public class FlatBufferBuilder {
         this.rootAddress = getNextAddress();
         int pointer = addNullPointer();
         int table = addTable(numFields);
-        Pointer.setReference(buffer, pointer, table);
+        Pointers.setReference(buffer, pointer, table);
         return this;
     }
 

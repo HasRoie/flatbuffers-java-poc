@@ -1,7 +1,7 @@
 package org.enner.flatbuffers.MyGame.Example;
 
 import org.enner.flatbuffers.FlatBufferBuilder;
-import org.enner.flatbuffers.Vector;
+import org.enner.flatbuffers.Vectors;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -91,7 +91,7 @@ public class MonsterWriteTest {
         assertEquals(vector, Monster.getInventoryAddress(buffer, monster));
 
         for (int i = 0; i < numElements; i++) {
-            int address = Vector.getValueTypeAddress(buffer, vector, i, elementSize);
+            int address = Vectors.getValueTypeAddress(buffer, vector, i, elementSize);
             buffer.put(address, (byte) i);
             assertEquals(i, Monster.getInventory(buffer, monster, i));
         }

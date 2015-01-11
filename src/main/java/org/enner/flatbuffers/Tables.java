@@ -14,7 +14,7 @@ import static org.enner.flatbuffers.Utilities.*;
  * @author Florian Enner < florian @ hebirobotics.com >
  * @since 10 Jan 2015
  */
-public class Table {
+public class Tables {
 
     /**
      * Returns true if there exists an entry in the vector table. Note that this can
@@ -41,17 +41,16 @@ public class Table {
         return getFieldAddress(bb, tableAddress, fieldId);
     }
 
-    public static void setValueTypeAddress(FlatBufferBuilder fbb, int tableAddress, int fieldId, int address) {
-        checkNotNull(checkNotNull(fbb).getBuffer());
+    public static void setValueTypeAddress(ByteBuffer bb, int tableAddress, int fieldId, int address) {
+        checkNotNull(bb);
         checkNotNegative(tableAddress);
         checkNotNegative(fieldId);
-        ByteBuffer bb = checkNotNull(fbb.getBuffer());
 
-        int vtableAddress = Pointer.dereferenceSigned32(bb, tableAddress);
+        int vtableAddress = Pointers.dereferenceSigned32(bb, tableAddress);
         checkArgument(fieldId < getFieldCount(bb, vtableAddress), "Field id is too large.");
         int offsetFromVectorTable = SIZEOF_VECTOR_TABLE_HEADER + fieldId * SIZEOF_SHORT;
         int pointer = vtableAddress + offsetFromVectorTable;
-        Pointer.setUnsigned16Reference(fbb.getBuffer(), pointer, address, tableAddress);
+        Pointers.setUnsigned16Reference(bb, pointer, address, tableAddress);
     }
 
     /**
@@ -60,32 +59,30 @@ public class Table {
      */
     public static int getReferenceTypeAddress(ByteBuffer bb, int tableAddress, int fieldId) {
         int pointer = getPointerAddress(bb, tableAddress, fieldId);
-        return pointer == NULL ? NULL : Pointer.dereference(bb, pointer);
+        return pointer == NULL ? NULL : Pointers.dereference(bb, pointer);
     }
 
-    public static void setReferenceTypeAddress(FlatBufferBuilder fbb, int tableAddress, int fieldId, int target) {
-        ByteBuffer buffer = checkNotNull(fbb).getBuffer();
+    public static void setReferenceTypeAddress(ByteBuffer buffer, int tableAddress, int fieldId, int target) {
         int pointer = getPointerAddress(buffer, tableAddress, fieldId);
         checkState(pointer != NULL, "Pointer must be initialized before setting an address");
-        Pointer.setReference(buffer, pointer, target);
+        Pointers.setReference(buffer, pointer, target);
     }
 
     private static int getPointerAddress(ByteBuffer bb, int tableAddress, int fieldId) {
         return getValueTypeAddress(bb, tableAddress, fieldId);
     }
 
-    private static int initValueType(FlatBufferBuilder fbb, int table, int fieldId, int size, boolean fillWithZeros) {
-        ByteBuffer buffer = checkNotNull(checkNotNull(fbb).getBuffer());
+    private static int initValueType(ByteBuffer buffer, int table, int fieldId, int size, boolean memsetZero) {
         checkNotNegative(table);
         checkNotNegative(fieldId);
         // Do nothing if data has already been initialized
-        int address = Table.getValueTypeAddress(buffer, table, fieldId);
+        int address = Tables.getValueTypeAddress(buffer, table, fieldId);
         if (address == NULL) {
             // Set the address first in order to make sure that we don't allocate memory
             // that we can't point to
-            address = fbb.getNextAddress();
-            Table.setValueTypeAddress(fbb, table, fieldId, address);
-            fbb.skipAndFillWithZeros(size, fillWithZeros);
+            address = Builders.getNextAddress(buffer);
+            Tables.setValueTypeAddress(buffer, table, fieldId, address);
+            Builders.skipAndClear(buffer, size, memsetZero);
         }
         return address;
     }
@@ -96,15 +93,15 @@ public class Table {
      *
      * @return address of pointer. The pointer gets initialized as NULL
      */
-    public static int initReferencePointer(FlatBufferBuilder fbb, int tableAddress, int fieldId) {
-        return initValueType(fbb, tableAddress, fieldId, SIZEOF_POINTER, true);
+    public static int initReferencePointer(ByteBuffer buffer, int tableAddress, int fieldId) {
+        return initValueType(buffer, tableAddress, fieldId, SIZEOF_POINTER, true);
     }
 
     /**
      * @return start address of value. Note that the space may contain garbage.
      */
-    public static int initValueType(FlatBufferBuilder fbb, int table, int fieldId, int size) {
-        return initValueType(fbb, table, fieldId, size, false);
+    public static int initValueType(ByteBuffer buffer, int table, int fieldId, int size) {
+        return initValueType(buffer, table, fieldId, size, false);
     }
 
     /**
@@ -113,7 +110,7 @@ public class Table {
     private static int getFieldAddress(ByteBuffer bb, int tableAddress, int fieldId) {
 
         // Find the start of the vector table
-        int vtableAddress = Pointer.dereferenceSigned32(bb, tableAddress);
+        int vtableAddress = Pointers.dereferenceSigned32(bb, tableAddress);
 
         // Check whether the field can exist. Older versions of the schema
         // may have fewer fields. In this case always assume a NULL offset.
@@ -124,7 +121,7 @@ public class Table {
         // Find the location in which the offset would be stored
         int offsetFromVectorTable = SIZEOF_VECTOR_TABLE_HEADER + fieldId * SIZEOF_SHORT;
         int pointer = vtableAddress + offsetFromVectorTable;
-        return Pointer.dereferenceUnsigned16(bb, pointer, tableAddress);
+        return Pointers.dereferenceUnsigned16(bb, pointer, tableAddress);
     }
 
     private static int getFieldCount(ByteBuffer bb, int vtAddress) {

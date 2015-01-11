@@ -12,7 +12,7 @@ import static org.enner.flatbuffers.Utilities.*;
  * @author Florian Enner < florian @ hebirobotics.com >
  * @since 10 Jan 2015
  */
-public class FlatString {
+public class Strings {
 
     /**
      * Note: Edited from original Table.__string(int)
@@ -25,8 +25,8 @@ public class FlatString {
         if (address == NULL)
             return defaultValue;
 
-        int start = Vector.getFirstElementAddress(address);
-        int length = Vector.size(buffer, address);
+        int start = Vectors.getFirstElementAddress(address);
+        int length = Vectors.size(buffer, address);
 
         if (buffer.hasArray()) {
             return new String(buffer.array(), start, length, UTF_8);
