@@ -16,7 +16,7 @@ public class Vectors {
     /**
      * @return element count
      */
-    public static int size(ByteBuffer buffer, int address) {
+    public static int getLength(ByteBuffer buffer, int address) {
         checkAddressNotNull(address);
         int elementCount = buffer.getInt(address);
         return elementCount;
@@ -43,7 +43,7 @@ public class Vectors {
             return NULL;
 
         // Make sure index is not out of bounds
-        int numElements = size(buffer, address);
+        int numElements = getLength(buffer, address);
         if (index >= numElements)
             throw new IndexOutOfBoundsException();
 
@@ -52,13 +52,9 @@ public class Vectors {
     }
 
     /**
-     * Returns the address of a stored reference type (String / Vector / Table)
-     * NULL if reference has not been set
+     * Returns the address of a stored reference type. NULL if reference has not been set
      */
     public static int getReferenceTypeAddress(ByteBuffer buffer, int address, int index) {
-        checkNotNull(buffer);
-        checkNotNegative(address);
-        checkNotNegative(index);
         int pointer = getValueTypeAddress(buffer, address, index, SIZEOF_POINTER);
         return pointer == NULL ? NULL : Pointers.dereference(buffer, pointer);
     }

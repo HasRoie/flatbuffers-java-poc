@@ -2,6 +2,8 @@ package org.enner.flatbuffers;
 
 import java.nio.ByteBuffer;
 
+import static org.enner.flatbuffers.Utilities.*;
+
 /**
  * Helper functions that are useful when creating a message
  *
@@ -49,4 +51,37 @@ public class Builders {
     public static int getNextAddress(ByteBuffer buffer) {
         return buffer.position();
     }
+
+    /**
+     * @return root address
+     */
+    public static int addRootTable(ByteBuffer buffer, int numFields) {
+        int root = getNextAddress(buffer);
+        int pointer = addNullPointer(buffer);
+        int table = addTable(buffer, numFields);
+        Pointers.setReference(buffer, pointer, table);
+        return root;
+    }
+
+    /**
+     * @return table address
+     */
+    public static int addTable(ByteBuffer buffer, int numFields) {
+        // Build header
+        int address = getNextAddress(buffer);
+        buffer.putInt(-SIZEOF_INT); // table header contains negative offset to its vtable
+        buffer.putShort((short) (SIZEOF_VECTOR_TABLE_HEADER + numFields * SIZEOF_SHORT));
+        buffer.putShort((short) 0); // ignore payload-length field. It doesn't mean much if payload is not contiguous
+
+        // Zero the vector table to avoid issues due to potential garbage
+        skipAndClear(buffer, numFields * SIZEOF_SHORT, true);
+        return address;
+    }
+
+    public static int addNullPointer(ByteBuffer buffer) {
+        int address = getNextAddress(buffer);
+        buffer.putInt(0);
+        return address;
+    }
+
 }

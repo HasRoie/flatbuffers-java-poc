@@ -1,6 +1,7 @@
 package org.enner.flatbuffers.MyGame.Example;
 
 import org.enner.flatbuffers.*;
+import org.enner.flatbuffers.MyGame.Example.Vec3.Vec3Builder;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -11,7 +12,9 @@ import static org.enner.flatbuffers.Utilities.*;
  * @author Florian Enner < florian @ hebirobotics.com >
  * @since 10 Jan 2015
  */
-public class Monster {
+public class Monster extends Table implements Addressable {
+
+    private Color color;
 
     public static int getMonsterFromRoot(ByteBuffer bb) {
         // First int is a pointer to the start of the object
@@ -20,128 +23,164 @@ public class Monster {
     }
 
     final static int FIELD_POS = 0;
+    final static int FIELD_MANA = 1;
     final static int FIELD_HP = 2;
     final static int FIELD_NAME = 3;
     final static int FIELD_INVENTORY = 5;
+    final static int FIELD_ENEMY = 12;
+    final static int FIELD_TEST_ARRAY_OF_STRING = 12;
+    final static int FIELD_COLOR = 6;
 
     final static short DEFAULT_HP = 100;
+    final static short DEFAULT_MANA = 150;
     final static String DEFAULT_NAME = null;
+    final static String DEFAULT_TEST_ARRAY_OF_STRING = null;
     final static byte DEFAULT_INVENTORY = 0;
+    final static byte DEFAULT_ENEMY = 0;
+    final static byte DEFAULT_COLOR = 8;
 
-    public static short getHp(ByteBuffer bb, int monster) {
-        int address = Tables.getValueTypeAddress(bb, monster, FIELD_HP);
-        return Primitives.getShort(bb, address, DEFAULT_HP);
+    public Monster getFromRoot() {
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
+        setAddress(Pointers.dereference(buffer, buffer.position()));
+        return this;
     }
 
-    public static boolean hasHp(ByteBuffer buffer, int monster) {
-        return Tables.hasField(buffer, monster, FIELD_HP);
+    public boolean hasHp() {
+        return hasField(FIELD_HP);
     }
 
-    public static int setHp(FlatBufferBuilder fbb, int monster, short hp) {
-        int address = Tables.getValueTypeAddress(fbb.getBuffer(), monster, FIELD_HP);
-        if (address != NULL) {
-            fbb.getBuffer().putShort(address, hp);
-        } else {
-            address = fbb.getNextAddress();
-            fbb.getBuffer().putShort(hp);
-            Tables.setValueTypeAddress(fbb.getBuffer(), monster, FIELD_HP, address);
+    public short getHp() {
+        return Primitives.getShort(getBuffer(), getValueTypeAddress(FIELD_HP), DEFAULT_HP);
+    }
+
+    public boolean hasMana() {
+        return hasField(FIELD_MANA);
+    }
+
+    public short getMana() {
+        return Primitives.getShort(getBuffer(), getValueTypeAddress(FIELD_MANA), DEFAULT_MANA);
+    }
+
+    public boolean hasPos() {
+        return hasAddressable(FIELD_POS, Type.VALUE);
+    }
+
+    public <T extends Vec3> T getPos(T vec3) {
+        return getAddressable(vec3, FIELD_POS);
+    }
+
+    public boolean hasName() {
+        return this.hasAddressable(FIELD_NAME, Type.REFERENCE);
+    }
+
+    public String getName() {
+        return Strings.toJavaString(getBuffer(), getReferenceTypeAddress(FIELD_NAME), DEFAULT_NAME);
+    }
+
+    public boolean hasInventory() {
+        return hasAddressable(FIELD_INVENTORY, Type.REFERENCE);
+    }
+
+    public int getInventoryLength() {
+        return getVectorLength(FIELD_INVENTORY);
+    }
+
+    public byte getInventory(int index) {
+        int address = getVectorElementAddress(FIELD_INVENTORY, index, SIZEOF_BYTE);
+        return Primitives.getByte(getBuffer(), address, DEFAULT_INVENTORY);
+    }
+
+    public boolean hasEnemy() {
+        return this.hasAddressable(FIELD_NAME, Type.REFERENCE);
+    }
+
+    public <T extends Monster> T getEnemy(T monster) {
+        return getAddressable(monster, FIELD_ENEMY);
+    }
+
+    public int getInventoryAddress() {
+        return getReferenceTypeAddress(FIELD_INVENTORY);
+    }
+
+    public boolean hasTestArrayOfString() {
+        return hasAddressable(FIELD_TEST_ARRAY_OF_STRING, Type.REFERENCE);
+    }
+
+    public int getTestArrayOfStringLength() {
+        return getVectorLength(FIELD_TEST_ARRAY_OF_STRING);
+    }
+
+    public String getTestArrayOfString(int index) {
+        int pointer = getVectorElementAddress(FIELD_TEST_ARRAY_OF_STRING, index, SIZEOF_BYTE);
+        int address = Pointers.dereference(getBuffer(), pointer);
+        return Strings.toJavaString(getBuffer(), address, DEFAULT_TEST_ARRAY_OF_STRING);
+    }
+
+    public Color getColor() {
+        byte value = Primitives.getByte(getBuffer(), getValueTypeAddress(FIELD_COLOR), DEFAULT_COLOR);
+        return Color.getByValue(value);
+    }
+
+    public static class MonsterBuilder extends Monster implements Builder {
+
+        public MonsterBuilder setHp(short value) {
+            Primitives.setShort(getBuffer(), initValueType(FIELD_HP, SIZEOF_SHORT), value);
+            return this;
         }
-        return address;
-    }
 
-    public static int getPos(ByteBuffer bb, int monster) {
-        return Tables.getValueTypeAddress(bb, monster, FIELD_POS);
-    }
-
-    public static boolean hasPos(ByteBuffer bb, int monster) {
-        return Tables.hasField(bb, monster, FIELD_POS);
-    }
-
-    public static int getPosBuilder(FlatBufferBuilder fbb, int monster) {
-        // Existing pos can be overwritten to save
-        int address = Tables.getValueTypeAddress(fbb.getBuffer(), monster, FIELD_POS);
-        if (address == NULL) {
-            // We set the pointer first in order to make sure that we don't
-            // allocate a struct that is outside the 65KB range.
-            address = fbb.getNextAddress();
-            Tables.setValueTypeAddress(fbb.getBuffer(), monster, FIELD_POS, address);
-            fbb.addStruct(Vec3.size());
+        public MonsterBuilder setMana(short value) {
+            Primitives.setShort(getBuffer(), initValueType(FIELD_MANA, SIZEOF_SHORT), value);
+            return this;
         }
-        return address;
+
+        public MonsterBuilder initPos() {
+            initReferencePointer(FIELD_POS);
+            return this;
+        }
+
+        public Vec3Builder getPosBuilder(Vec3Builder builder) {
+            return this.getAddressableBuilder(builder, FIELD_POS);
+        }
+
+        public MonsterBuilder initName() {
+            initReferencePointer(FIELD_NAME);
+            return this;
+        }
+
+        public MonsterBuilder initInventory() {
+            initReferencePointer(FIELD_INVENTORY);
+            return this;
+        }
+
+        public MonsterBuilder setInventoryAddress(int address) {
+            Tables.setReferenceTypeAddress(getBuffer(), getAddress(), FIELD_INVENTORY, address);
+            return this;
+        }
+
+        public MonsterBuilder setName(String value) {
+            // TODO: implement string to utf-8
+            return this;
+        }
+
+        public MonsterBuilder initEnemy() {
+            initReferencePointer(FIELD_ENEMY);
+            return this;
+        }
+
+        public MonsterBuilder getEnemyBuilder(MonsterBuilder builder) {
+            return this.getAddressableBuilder(builder, FIELD_POS);
+        }
+
+        public MonsterBuilder initTestArrayOfString() {
+            initReferencePointer(FIELD_TEST_ARRAY_OF_STRING);
+            return this;
+        }
+
     }
 
-    public static boolean hasName(ByteBuffer bb, int monster) {
-        return Tables.hasField(bb, monster, FIELD_NAME);
-    }
-
-    public static String getName(ByteBuffer bb, int monster) {
-        int string = Tables.getReferenceTypeAddress(bb, monster, FIELD_NAME);
-        return Strings.toJavaString(bb, string, DEFAULT_NAME);
-    }
-
-    public static void initName(FlatBufferBuilder fbb, int monster) {
-        Tables.initReferencePointer(fbb.getBuffer(), monster, FIELD_NAME);
-    }
-
-    public static int setName(FlatBufferBuilder fbb, int monster, int flatString) {
-        return 0;
-    }
-
-    public static short getMana(ByteBuffer bb, int monster) {
-        int id = 1;
-        short defaultValue = 150;
-        int address = Tables.getValueTypeAddress(bb, monster, id);
-        return Primitives.getShort(bb, address, defaultValue);
-    }
-
-    public static int getInventoryLength(ByteBuffer bb, int monster) {
-        int vector = Tables.getReferenceTypeAddress(bb, monster, FIELD_INVENTORY);
-        return Vectors.size(bb, vector);
-    }
-
-    public static byte getInventory(ByteBuffer bb, int monster, int index) {
-        int vector = Tables.getReferenceTypeAddress(bb, monster, FIELD_INVENTORY);
-        int address = Vectors.getValueTypeAddress(bb, vector, index, SIZEOF_BYTE);
-        return Primitives.getByte(bb, address, DEFAULT_INVENTORY);
-    }
-
-    public static int getInventoryAddress(ByteBuffer buffer, int monster) {
-        return Tables.getReferenceTypeAddress(buffer, monster, FIELD_INVENTORY);
-    }
-
-    public static void initInventory(FlatBufferBuilder fbb, int monster) {
-        Tables.initReferencePointer(fbb.getBuffer(), monster, FIELD_INVENTORY);
-    }
-
-    public static void setInventoryAddress(FlatBufferBuilder fbb, int monster, int inventory) {
-        Tables.setReferenceTypeAddress(fbb.getBuffer(), monster, FIELD_INVENTORY, inventory);
-    }
-
-    public static Color getColor(ByteBuffer bb, int monster) {
-        int id = 6;
-        byte defaultValue = 8;
-        int address = Tables.getValueTypeAddress(bb, monster, id);
-        byte enumValue = Primitives.getByte(bb, address, defaultValue);
-        return Color.getByValue(enumValue);
-    }
-
-    public static int getEnemy(ByteBuffer bb, int monster) {
-        int id = 12;
-        return Tables.getReferenceTypeAddress(bb, monster, id);
-    }
-
-    public static String getTestArrayOfString(ByteBuffer bb, int monster, int index) {
-        int id = 10;
-        String defaultValue = null;
-        int vector = Tables.getReferenceTypeAddress(bb, monster, id);
-        int string = Vectors.getReferenceTypeAddress(bb, vector, index);
-        return Strings.toJavaString(bb, string, defaultValue);
-    }
-
-    public static int getTestArrayOfStringLength(ByteBuffer bb, int monster) {
-        int id = 10;
-        int vector = Tables.getReferenceTypeAddress(bb, monster, id);
-        return Vectors.size(bb, vector);
+    @Override
+    public int fieldCount() {
+        return 15;
     }
 
 }

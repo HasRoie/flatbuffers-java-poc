@@ -1,6 +1,8 @@
 package org.enner.flatbuffers.MyGame.Example;
 
 import org.enner.flatbuffers.FlatBufferBuilder;
+import org.enner.flatbuffers.MyGame.Example.Monster.MonsterBuilder;
+import org.enner.flatbuffers.MyGame.Example.Vec3.Vec3Builder;
 import org.enner.flatbuffers.Vectors;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,6 +16,9 @@ public class MonsterWriteTest {
     byte[] testData;
     ByteBuffer buffer;
     FlatBufferBuilder fbb;
+    MonsterBuilder monster;
+    MonsterBuilder enemy;
+    Vec3Builder pos;
 
     private int createRootMonster() {
         int numFields = 15;
@@ -21,6 +26,7 @@ public class MonsterWriteTest {
         int position = buffer.position();
         buffer.position(fbb.getRootAddress());
         int monster = Monster.getMonsterFromRoot(buffer);
+        this.monster.getFromRoot();
         buffer.position(position);
         return monster;
     }
@@ -30,6 +36,10 @@ public class MonsterWriteTest {
         testData = new byte[1024];
         buffer = ByteBuffer.wrap(testData);
         fbb = FlatBufferBuilder.wrapAndClear(buffer);
+        monster = new MonsterBuilder();
+        monster.setBuffer(buffer);
+        pos = new Vec3Builder();
+        pos.setBuffer(buffer);
     }
 
     @Test
@@ -40,60 +50,61 @@ public class MonsterWriteTest {
 
     @Test
     public void testSetHp() throws Exception {
-        int monster = createRootMonster();
-        assertFalse(Monster.hasHp(buffer, monster));
+        createRootMonster();
+        assertFalse(monster.hasHp());
         short hp = 65;
-        Monster.setHp(fbb, monster, hp);
-        assertTrue(Monster.hasHp(buffer, monster));
-        assertEquals(hp, Monster.getHp(buffer, monster));
+        monster.setHp(hp);
+        assertTrue(monster.hasHp());
+        assertEquals(hp, monster.getHp());
         hp = 96;
-        Monster.setHp(fbb, monster, hp);
-        assertEquals(hp, Monster.getHp(buffer, monster));
+        monster.setHp(hp);
+        assertEquals(hp, monster.getHp());
     }
 
     @Test
     public void testSetPos() throws Exception {
-        int monster = createRootMonster();
-        assertFalse(Monster.hasPos(buffer, monster));
-        int pos = Monster.getPosBuilder(fbb, monster);
-        assertTrue(Monster.hasPos(buffer, monster));
-        assertEquals(pos, Monster.getPos(buffer, monster));
-        Vec3.setX(fbb, pos, 0f);
-        Vec3.setY(fbb, pos, 1f);
-        Vec3.setZ(fbb, pos, 2f);
-        assertEquals(0f, Vec3.getX(buffer, pos), 0);
-        assertEquals(1f, Vec3.getY(buffer, pos), 0);
-        assertEquals(2f, Vec3.getZ(buffer, pos), 0);
-        Vec3.setAll(fbb, pos, 2f, 3f, 4f);
-        assertEquals(2f, Vec3.getX(buffer, pos), 0);
-        assertEquals(3f, Vec3.getY(buffer, pos), 0);
-        assertEquals(4f, Vec3.getZ(buffer, pos), 0);
+        createRootMonster();
+        assertFalse(monster.hasPos());
+        monster.getPosBuilder(pos);
+        assertTrue(monster.hasPos());
+        monster.getPosBuilder(pos)
+                .setX(0f)
+                .setY(1f)
+                .setZ(2f);
+        assertEquals(0f, pos.getX(), 0);
+        assertEquals(1f, pos.getY(), 0);
+        assertEquals(2f, pos.getZ(), 0);
+        pos.setAll(2f, 3f, 4f);
+        assertEquals(2f, pos.getX(), 0);
+        assertEquals(3f, pos.getY(), 0);
+        assertEquals(4f, pos.getZ(), 0);
     }
 
     @Test
     public void testSetName() throws Exception {
-        int monster = createRootMonster();
-        assertFalse(Monster.hasName(buffer, monster));
-        Monster.initName(fbb, monster);
-        assertTrue(Monster.hasName(buffer, monster));
-        assertEquals(null, Monster.getName(buffer, monster));
+        createRootMonster();
+        assertFalse(monster.hasName());
+        monster.initName();
+        assertFalse(monster.hasName());
+        assertEquals(null, monster.getName());
         // TODO: allocate string and write
     }
 
     @Test
     public void testSetInventory() throws Exception {
-        int monster = createRootMonster();
+        createRootMonster();
         int numElements = 5;
         int elementSize = 1;
-        Monster.initInventory(fbb, monster);
+        monster.initInventory();
+
         int vector = fbb.addVector(numElements, elementSize);
-        Monster.setInventoryAddress(fbb, monster, vector);
-        assertEquals(vector, Monster.getInventoryAddress(buffer, monster));
+        monster.setInventoryAddress(vector);
+        assertEquals(vector, monster.getInventoryAddress());
 
         for (int i = 0; i < numElements; i++) {
             int address = Vectors.getValueTypeAddress(buffer, vector, i, elementSize);
             buffer.put(address, (byte) i);
-            assertEquals(i, Monster.getInventory(buffer, monster, i));
+            assertEquals(i, monster.getInventory(i));
         }
     }
 

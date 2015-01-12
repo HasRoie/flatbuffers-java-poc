@@ -57,9 +57,9 @@ public class Pointers {
         return offset == NULL ? NULL : tableAddress + offset;
     }
 
-    public static void setUnsigned16Reference(ByteBuffer buffer, int pointer, int address, int tableAddress) {
+    public static void setUnsigned16Reference(ByteBuffer buffer, int pointer, int targetAddress, int tableAddress) {
         // Make sure that the offset is within the 65KB limit of unsigned int16
-        int offset = address - tableAddress;
+        int offset = targetAddress - tableAddress;
         checkNotNegative(offset);
         checkArgument(offset <= USHORT_MAX, "Address is outside the table's range of at most UINT16_MAX bytes");
         buffer.putShort(pointer, (short) offset);

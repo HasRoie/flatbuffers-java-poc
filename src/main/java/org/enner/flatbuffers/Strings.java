@@ -26,7 +26,7 @@ public class Strings {
             return defaultValue;
 
         int start = Vectors.getFirstElementAddress(address);
-        int length = Vectors.size(buffer, address);
+        int length = Vectors.getLength(buffer, address);
 
         if (buffer.hasArray()) {
             return new String(buffer.array(), start, length, UTF_8);

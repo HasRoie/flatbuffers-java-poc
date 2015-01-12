@@ -1,7 +1,6 @@
 package org.enner.flatbuffers.MyGame.Example;
 
 import org.enner.flatbuffers.MyGame.Test.GoogleTestData;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -14,90 +13,88 @@ public class MonsterReadTest {
 
     byte[] testData;
     ByteBuffer bb;
-    com.google.flatbuffers.MyGame.Example.Monster monster;
-    com.google.flatbuffers.MyGame.Example.Vec3 pos;
+    com.google.flatbuffers.MyGame.Example.Monster gMonster;
+    com.google.flatbuffers.MyGame.Example.Vec3 gPos;
+    Monster monster;
+    Vec3 pos;
 
     @Before
     public void setUp() throws Exception {
         testData = GoogleTestData.createTestData();
         bb = ByteBuffer.wrap(testData);
-        monster = com.google.flatbuffers.MyGame.Example.Monster.getRootAsMonster(bb);
-        pos = monster.pos();
+        gMonster = com.google.flatbuffers.MyGame.Example.Monster.getRootAsMonster(bb);
+        gPos = gMonster.pos();
+        monster = new Monster();
+        monster.setBuffer(bb);
+        monster.getFromRoot();
+        pos = new Vec3();
+        pos.setBuffer(bb);
     }
 
     @Test
     public void testGetMonsterFromRoot() throws Exception {
         assertEquals(48, Monster.getMonsterFromRoot(bb));
+        assertEquals(48, monster.getFromRoot().getAddress());
     }
 
     @Test
     public void testGetHp() throws Exception {
-        int monster = Monster.getMonsterFromRoot(bb);
-        assertEquals(this.monster.hp(), Monster.getHp(bb, monster));
+        assertEquals(gMonster.hp(), monster.getFromRoot().getHp());
     }
 
     @Test
     public void testGetPos() throws Exception {
-        int monster = Monster.getMonsterFromRoot(bb);
-        int pos = Monster.getPos(bb, monster);
-        assertEquals(this.pos.x(), Vec3.getX(bb, pos), 0);
-        assertEquals(this.pos.y(), Vec3.getY(bb, pos), 0);
-        assertEquals(this.pos.z(), Vec3.getZ(bb, pos), 0);
+        monster.getPos(pos);
+        assertEquals(this.gPos.x(), pos.getX(), 0);
+        assertEquals(this.gPos.y(), pos.getY(), 0);
+        assertEquals(this.gPos.z(), pos.getZ(), 0);
     }
 
     @Test
     public void testGetMana() throws Exception {
-        int monster = Monster.getMonsterFromRoot(bb);
-        assertEquals(this.monster.mana(), Monster.getMana(bb, monster));
+        assertEquals(this.gMonster.mana(), monster.getMana());
     }
 
     @Test
     public void testGetName() throws Exception {
-        int monster = Monster.getMonsterFromRoot(bb);
-        assertEquals(this.monster.name(), Monster.getName(bb, monster));
+        assertEquals(this.gMonster.name(), monster.getName());
     }
 
     @Test
     public void testGetInventory() throws Exception {
-        int monster = Monster.getMonsterFromRoot(bb);
-        int length = Monster.getInventoryLength(bb, monster);
-        assertEquals(this.monster.inventoryLength(), length);
+        int length = monster.getInventoryLength();
+        assertEquals(gMonster.inventoryLength(), length);
         for (int i = 0; i < length; i++) {
-            assertEquals(this.monster.inventory(i), Monster.getInventory(bb, monster, i));
+            assertEquals(gMonster.inventory(i), monster.getInventory(i));
         }
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void testGetInventoryOutOfBounds() throws Exception {
-        int monster = Monster.getMonsterFromRoot(bb);
-        Monster.getInventory(bb, monster, 5);
+        monster.getInventory(5);
     }
 
     @Test
     public void testGetInventoryLength() throws Exception {
-        int monster = Monster.getMonsterFromRoot(bb);
-        assertEquals(this.monster.inventoryLength(), Monster.getInventoryLength(bb, monster));
+        assertEquals(gMonster.inventoryLength(), monster.getInventoryLength());
     }
 
     @Test
     public void testGetColor() throws Exception {
-        int monster = Monster.getMonsterFromRoot(bb);
-        assertEquals(this.monster.color(), Monster.getColor(bb, monster).getValue());
+        assertEquals(this.gMonster.color(), monster.getColor().getValue());
     }
 
     @Test
     public void testGetEnemy() throws Exception {
-        int monster = Monster.getMonsterFromRoot(bb);
-        assertEquals(this.monster.enemy() == null, Monster.getEnemy(bb, monster) == NULL);
+        assertEquals(this.gMonster.enemy() == null, monster.getEnemy(new Monster()).getAddress() == NULL);
     }
 
     @Test
     public void testArrayOfStrings() throws Exception {
-        int monster = Monster.getMonsterFromRoot(bb);
-        int length = Monster.getTestArrayOfStringLength(bb, monster);
-        assertEquals(this.monster.testarrayofstringLength(), length);
+        int length = monster.getTestArrayOfStringLength();
+        assertEquals(this.gMonster.testarrayofstringLength(), length);
         for (int i = 0; i < length; i++) {
-            assertEquals(this.monster.testarrayofstring(i), Monster.getTestArrayOfString(bb, monster, i));
+            assertEquals(this.gMonster.testarrayofstring(i), monster.getTestArrayOfString(i));
         }
     }
 

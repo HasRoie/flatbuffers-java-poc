@@ -19,12 +19,11 @@ public class Tables {
     /**
      * Returns true if there exists an entry in the vector table. Note that this can
      * be ambiguous because implementations may omit default values during serialization.
+     * Note that for references this only checks whether a reference exists, and returns
+     * true even if the reference is not valid.
      */
     public static boolean hasField(ByteBuffer bb, int tableAddress, int fieldId) {
-        checkNotNull(bb);
-        checkNotNegative(tableAddress);
-        checkNotNegative(fieldId);
-        return getFieldAddress(bb, tableAddress, fieldId) != NULL;
+        return getValueTypeAddress(bb, tableAddress, fieldId) != NULL;
     }
 
     /**
@@ -72,7 +71,14 @@ public class Tables {
         return getValueTypeAddress(bb, tableAddress, fieldId);
     }
 
-    private static int initValueType(ByteBuffer buffer, int table, int fieldId, int size, boolean memsetZero) {
+    /**
+     * @return default value type initialization. Potentially existing garbage does not get cleaned.
+     */
+    public static int initValueType(ByteBuffer buffer, int table, int fieldId, int size) {
+        return initValueType(buffer, table, fieldId, size, false);
+    }
+
+    public static int initValueType(ByteBuffer buffer, int table, int fieldId, int size, boolean memsetZero) {
         checkNotNegative(table);
         checkNotNegative(fieldId);
         // Do nothing if data has already been initialized
@@ -89,7 +95,7 @@ public class Tables {
 
     /**
      * Makes sure that a pointer object exists. If the pointer already exists, then nothing happens.
-     * This is useful for
+     * This is useful for creating reference types before the address to them is known.
      *
      * @return address of pointer. The pointer gets initialized as NULL
      */
@@ -97,15 +103,15 @@ public class Tables {
         return initValueType(buffer, tableAddress, fieldId, SIZEOF_POINTER, true);
     }
 
-    /**
-     * @return start address of value. Note that the space may contain garbage.
-     */
-    public static int initValueType(ByteBuffer buffer, int table, int fieldId, int size) {
-        return initValueType(buffer, table, fieldId, size, false);
+    public static int getPayloadSize(ByteBuffer bb, int tableAddress) {
+        // Payload size is in the 2nd short of the header. Size is in bytes
+        // and includes the header itself.
+        int vtAddress = Pointers.dereferenceSigned32(bb, tableAddress);
+        return unsigned(bb.getShort(vtAddress + SIZEOF_SHORT));
     }
 
     /**
-     * Returns the offset of an element relative to the table address
+     * Returns the address of a referenced element. NULL if not available.
      */
     private static int getFieldAddress(ByteBuffer bb, int tableAddress, int fieldId) {
 
@@ -130,12 +136,6 @@ public class Tables {
         int vectorTableSize = unsigned(bb.getShort(vtAddress));
         int numFields = (vectorTableSize - SIZEOF_VECTOR_TABLE_HEADER) / SIZEOF_SHORT;
         return numFields;
-    }
-
-    private static int getPayloadSize(ByteBuffer bb, int vtAddress) {
-        // Payload size is in the 2nd short of the header. Size is in bytes
-        // and includes the header itself.
-        return unsigned(bb.getShort(vtAddress + SIZEOF_SHORT));
     }
 
 }
