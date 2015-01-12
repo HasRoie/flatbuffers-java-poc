@@ -2,6 +2,7 @@ package org.enner.flatbuffers.MyGame.Example;
 
 import org.enner.flatbuffers.*;
 import org.enner.flatbuffers.MyGame.Example.Vec3.Vec3Builder;
+import org.enner.flatbuffers.Vector.ByteVector;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -22,22 +23,9 @@ public class Monster extends Table implements Addressable {
         return Pointers.dereference(bb, bb.position());
     }
 
-    final static int FIELD_POS = 0;
-    final static int FIELD_MANA = 1;
-    final static int FIELD_HP = 2;
-    final static int FIELD_NAME = 3;
-    final static int FIELD_INVENTORY = 5;
-    final static int FIELD_ENEMY = 12;
-    final static int FIELD_TEST_ARRAY_OF_STRING = 12;
-    final static int FIELD_COLOR = 6;
-
-    final static short DEFAULT_HP = 100;
-    final static short DEFAULT_MANA = 150;
-    final static String DEFAULT_NAME = null;
-    final static String DEFAULT_TEST_ARRAY_OF_STRING = null;
-    final static byte DEFAULT_INVENTORY = 0;
-    final static byte DEFAULT_ENEMY = 0;
-    final static byte DEFAULT_COLOR = 8;
+    public static MonsterBuilder newBuilder(ByteBuffer buffer) {
+        return new MonsterBuilder(buffer);
+    }
 
     public Monster getFromRoot() {
         buffer.order(ByteOrder.LITTLE_ENDIAN);
@@ -81,13 +69,9 @@ public class Monster extends Table implements Addressable {
         return hasAddressable(FIELD_INVENTORY, Type.REFERENCE);
     }
 
-    public int getInventoryLength() {
-        return getVectorLength(FIELD_INVENTORY);
-    }
-
-    public byte getInventory(int index) {
-        int address = getVectorElementAddress(FIELD_INVENTORY, index, SIZEOF_BYTE);
-        return Primitives.getByte(getBuffer(), address, DEFAULT_INVENTORY);
+    public ByteVector getInventory() {
+        int address = getReferenceTypeAddress(FIELD_INVENTORY);
+        return Vector.CombinedVector.newVector(getBuffer(), address, SIZEOF_BYTE, false);
     }
 
     public boolean hasEnemy() {
@@ -96,10 +80,6 @@ public class Monster extends Table implements Addressable {
 
     public <T extends Monster> T getEnemy(T monster) {
         return getAddressable(monster, FIELD_ENEMY);
-    }
-
-    public int getInventoryAddress() {
-        return getReferenceTypeAddress(FIELD_INVENTORY);
     }
 
     public boolean hasTestArrayOfString() {
@@ -123,6 +103,15 @@ public class Monster extends Table implements Addressable {
 
     public static class MonsterBuilder extends Monster implements Builder {
 
+        private MonsterBuilder(ByteBuffer buffer) {
+            this.buffer = buffer;
+        }
+
+        public MonsterBuilder createRoot() {
+            setAddress(Builders.addTable(getBuffer(), fieldCount()));
+            return this;
+        }
+
         public MonsterBuilder setHp(short value) {
             Primitives.setShort(getBuffer(), initValueType(FIELD_HP, SIZEOF_SHORT), value);
             return this;
@@ -138,6 +127,10 @@ public class Monster extends Table implements Addressable {
             return this;
         }
 
+        public Vec3Builder getPosBuilder() {
+            return getPosBuilder(new Vec3Builder());
+        }
+
         public Vec3Builder getPosBuilder(Vec3Builder builder) {
             return this.getAddressableBuilder(builder, FIELD_POS);
         }
@@ -149,6 +142,13 @@ public class Monster extends Table implements Addressable {
 
         public MonsterBuilder initInventory() {
             initReferencePointer(FIELD_INVENTORY);
+            return this;
+        }
+
+        public MonsterBuilder createInventory(int length) {
+            int pointer = initReferencePointer(FIELD_INVENTORY);
+            int address = Builders.addVector(getBuffer(), length, SIZEOF_BYTE, false);
+            Pointers.setReference(buffer, pointer, address);
             return this;
         }
 
@@ -167,6 +167,10 @@ public class Monster extends Table implements Addressable {
             return this;
         }
 
+        public MonsterBuilder getEnemyBuilder() {
+            return getEnemyBuilder(Monster.newBuilder(getBuffer()));
+        }
+
         public MonsterBuilder getEnemyBuilder(MonsterBuilder builder) {
             return this.getAddressableBuilder(builder, FIELD_POS);
         }
@@ -176,7 +180,28 @@ public class Monster extends Table implements Addressable {
             return this;
         }
 
+        public Vector.ByteVectorBuilder getInventoryBuilder() {
+            int address = getReferenceTypeAddress(FIELD_INVENTORY);
+            return Vector.CombinedVector.newVector(getBuffer(), address, SIZEOF_BYTE, false);
+        }
     }
+
+    final static int FIELD_POS = 0;
+    final static int FIELD_MANA = 1;
+    final static int FIELD_HP = 2;
+    final static int FIELD_NAME = 3;
+    final static int FIELD_INVENTORY = 5;
+    final static int FIELD_ENEMY = 12;
+    final static int FIELD_TEST_ARRAY_OF_STRING = 12;
+    final static int FIELD_COLOR = 6;
+
+    final static short DEFAULT_HP = 100;
+    final static short DEFAULT_MANA = 150;
+    final static String DEFAULT_NAME = null;
+    final static String DEFAULT_TEST_ARRAY_OF_STRING = null;
+    final static byte DEFAULT_INVENTORY = 0;
+    final static byte DEFAULT_ENEMY = 0;
+    final static byte DEFAULT_COLOR = 8;
 
     @Override
     public int fieldCount() {

@@ -78,6 +78,13 @@ public class Builders {
         return address;
     }
 
+    public static int addVector(ByteBuffer buffer, int numElements, int elementSize, boolean containsReferences) {
+        int address = getNextAddress(buffer);
+        buffer.putInt(numElements);
+        skipAndClear(buffer, numElements * elementSize, containsReferences);
+        return address;
+    }
+
     public static int addNullPointer(ByteBuffer buffer) {
         int address = getNextAddress(buffer);
         buffer.putInt(0);

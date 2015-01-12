@@ -3,7 +3,7 @@ package org.enner.flatbuffers.MyGame.Example;
 import org.enner.flatbuffers.FlatBufferBuilder;
 import org.enner.flatbuffers.MyGame.Example.Monster.MonsterBuilder;
 import org.enner.flatbuffers.MyGame.Example.Vec3.Vec3Builder;
-import org.enner.flatbuffers.Vectors;
+import org.enner.flatbuffers.Vector.ByteVectorBuilder;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -36,8 +36,7 @@ public class MonsterWriteTest {
         testData = new byte[1024];
         buffer = ByteBuffer.wrap(testData);
         fbb = FlatBufferBuilder.wrapAndClear(buffer);
-        monster = new MonsterBuilder();
-        monster.setBuffer(buffer);
+        monster = Monster.newBuilder(buffer);
         pos = new Vec3Builder();
         pos.setBuffer(buffer);
     }
@@ -95,16 +94,16 @@ public class MonsterWriteTest {
         createRootMonster();
         int numElements = 5;
         int elementSize = 1;
-        monster.initInventory();
 
-        int vector = fbb.addVector(numElements, elementSize);
-        monster.setInventoryAddress(vector);
-        assertEquals(vector, monster.getInventoryAddress());
+        assertFalse(monster.hasInventory());
+        assertFalse(monster.initInventory().hasInventory());
+        assertTrue(monster.createInventory(numElements).hasInventory());
+        assertEquals(numElements, monster.getInventory().length());
 
+        ByteVectorBuilder inventory = monster.getInventoryBuilder();
         for (int i = 0; i < numElements; i++) {
-            int address = Vectors.getValueTypeAddress(buffer, vector, i, elementSize);
-            buffer.put(address, (byte) i);
-            assertEquals(i, monster.getInventory(i));
+            inventory.setByte(i, (byte) i);
+            assertEquals(i, inventory.getByte(i));
         }
     }
 
