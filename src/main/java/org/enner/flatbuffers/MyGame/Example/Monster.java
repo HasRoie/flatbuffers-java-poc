@@ -180,7 +180,7 @@ public class Monster extends Table implements Addressable {
             return this;
         }
 
-        public Vector.ByteVectorBuilder getInventoryBuilder() {
+        public Vector.ByteVector getInventoryBuilder() {
             int address = getReferenceTypeAddress(FIELD_INVENTORY);
             return Vector.CombinedVector.newVector(getBuffer(), address, SIZEOF_BYTE, false);
         }

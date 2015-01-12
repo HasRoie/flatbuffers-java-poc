@@ -1,10 +1,7 @@
 package org.enner.flatbuffers.test;
 
 import org.enner.flatbuffers.Addressable.Builder;
-import org.enner.flatbuffers.Builders;
-import org.enner.flatbuffers.Pointers;
-import org.enner.flatbuffers.Table;
-import org.enner.flatbuffers.Vector;
+import org.enner.flatbuffers.*;
 import org.enner.flatbuffers.Vector.ByteVector;
 import org.enner.flatbuffers.Vector.StructVector;
 import org.enner.flatbuffers.Vector.TableVector;
@@ -59,6 +56,19 @@ public final class Monster extends Table implements Builder {
 
     public Monster setHp(short value) {
         setShort(getBuffer(), initPrimitive(HP_ID, SIZEOF_SHORT), value);
+        return this;
+    }
+
+    public boolean hasMana() {
+        return hasField(MANA_ID);
+    }
+
+    public short getMana() {
+        return getShort(getBuffer(), getValueTypeAddress(MANA_ID), MANA_DEFAULT);
+    }
+
+    public Monster setMana(short value) {
+        setShort(getBuffer(), initPrimitive(MANA_ID, SIZEOF_SHORT), value);
         return this;
     }
 
@@ -166,6 +176,24 @@ public final class Monster extends Table implements Builder {
         return getAddressableBuilder(enemy, ENEMY_ID);
     }
 
+    public boolean hasName() {
+        return hasAddressable(NAME_ID, Type.REFERENCE);
+    }
+
+    public Monster initName() {
+        initReferencePointer(NAME_ID);
+        return this;
+    }
+
+    public String getName() {
+        return Strings.toJavaString(getBuffer(), getReferenceTypeAddress(NAME_ID), null);
+    }
+
+    public Monster setName(String name) {
+        // TODO: implement string to utf-8
+        return this;
+    }
+
     public Monster getFromRoot() {
         buffer.order(ByteOrder.LITTLE_ENDIAN);
         setAddress(Pointers.dereference(buffer, buffer.position()));
@@ -200,6 +228,7 @@ public final class Monster extends Table implements Builder {
     }
 
     private static int POSITION_ID = 0;
+    private static int MANA_ID = 1;
     private static int HP_ID = 2;
     private static int NAME_ID = 3; // (required)
     private static int COLOR_ID = 6;
@@ -212,6 +241,7 @@ public final class Monster extends Table implements Builder {
 
     // Only primitives need defaults
     static short HP_DEFAULT = 100;
+    static short MANA_DEFAULT = 150;
     static boolean FRIENDLY_DEFAULT = true;
     static byte COLOR_DEFAULT = Color.BLUE.getValue();
     static short INVENTORY_DEFAULT = 0; // ubytes

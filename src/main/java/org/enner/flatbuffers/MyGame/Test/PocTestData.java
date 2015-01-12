@@ -4,7 +4,7 @@ import org.enner.flatbuffers.Builders;
 import org.enner.flatbuffers.MyGame.Example.Monster;
 import org.enner.flatbuffers.MyGame.Example.Monster.MonsterBuilder;
 import org.enner.flatbuffers.MyGame.Example.Vec3;
-import org.enner.flatbuffers.Vector.ByteVectorBuilder;
+import org.enner.flatbuffers.Vector;
 
 import java.nio.ByteBuffer;
 
@@ -47,9 +47,9 @@ public class PocTestData {
         // Building Strings
 
         // Creating and iterating through a vector of primitives
-        ByteVectorBuilder inventory = monster
+        Vector.ByteVector inventory = monster
                 .createInventory(5)
-                .getInventoryBuilder();
+                .getInventory();
 
         if (monster.hasInventory()) {
             int length = inventory.length();

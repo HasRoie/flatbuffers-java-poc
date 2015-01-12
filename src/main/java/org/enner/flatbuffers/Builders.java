@@ -91,4 +91,13 @@ public class Builders {
         return address;
     }
 
+    public static byte[] getSizedByteArray(ByteBuffer buffer, int start, int length) {
+        byte[] bytes = new byte[length];
+        int position = buffer.position();
+        buffer.position(start);
+        buffer.get(bytes);
+        buffer.position(position);
+        return bytes;
+    }
+
 }

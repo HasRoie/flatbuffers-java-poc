@@ -141,7 +141,6 @@ public class ReadWriteTest {
                     .getHp();
             assertEquals(i, hp);
         }
-
     }
 
 }

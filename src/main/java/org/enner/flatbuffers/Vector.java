@@ -29,10 +29,8 @@ public interface Vector extends Addressable {
 
     public static interface ByteVector extends Vector {
         byte getByte(int index);
-    }
 
-    public static interface ByteVectorBuilder extends ByteVector {
-        ByteVectorBuilder setByte(int index, byte value);
+        ByteVector setByte(int index, byte value);
     }
 
     public static interface StructVector<T extends Addressable> extends Vector {
@@ -41,15 +39,17 @@ public interface Vector extends Addressable {
 
     public static interface TableVector<T extends Addressable> extends Vector {
         public T getTable(T table, int index);
+
         public TableVector<T> setTable(int index, T table);
     }
 
     public static interface VectorVector<T extends Addressable> extends Vector {
         public T getVector(T vector, int index);
+
         public VectorVector<T> setVector(int index, T vector);
     }
 
-    public static class CombinedVector<T extends Addressable> extends ReferenceType implements ByteVectorBuilder, StructVector<T>, TableVector<T>, VectorVector<T> {
+    public static class CombinedVector<T extends Addressable> extends ReferenceType implements ByteVector, StructVector<T>, TableVector<T>, VectorVector<T> {
 
         @SuppressWarnings("unchecked")
         public static <V extends Addressable> CombinedVector<V> newVector(ByteBuffer buffer, int address, int elementSize, boolean containsReferences) {
@@ -58,6 +58,16 @@ public interface Vector extends Addressable {
             vector.setAddress(address);
             vector.setContainsReferences(containsReferences);
             vector.setElementSize(elementSize);
+            return (CombinedVector<V>) vector;
+        }
+
+        @SuppressWarnings("unchecked")
+        public static <V extends Addressable> CombinedVector<V> withBuffer(ByteBuffer buffer) {
+            CombinedVector vector = new CombinedVector();
+            vector.setBuffer(buffer);
+            vector.setAddress(0);
+            vector.setContainsReferences(false);
+            vector.setElementSize(0);
             return (CombinedVector<V>) vector;
         }
 
@@ -109,7 +119,7 @@ public interface Vector extends Addressable {
         }
 
         @Override
-        public ByteVectorBuilder setByte(int index, byte value) {
+        public ByteVector setByte(int index, byte value) {
             Primitives.setByte(getBuffer(), getValueTypeAddress(index), value);
             return this;
         }
