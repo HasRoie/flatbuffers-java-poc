@@ -24,6 +24,8 @@ public interface Addressable {
 
     public void initialize(ByteBuffer buffer, int address);
 
+    public boolean isNull();
+
 
     public static enum Type {
         VALUE, // primitives / struct
@@ -57,6 +59,10 @@ public interface Addressable {
         public void initialize(ByteBuffer buffer, int address) {
             setBuffer(buffer);
             setAddress(address);
+        }
+
+        public boolean isNull() {
+            return address == NULL;
         }
 
         protected ByteBuffer buffer = null;
