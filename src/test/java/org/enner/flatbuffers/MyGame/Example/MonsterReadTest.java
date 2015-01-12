@@ -89,7 +89,7 @@ public class MonsterReadTest {
 
     @Test
     public void testGetEnemy() throws Exception {
-        assertEquals(this.gMonster.enemy() == null, monster.getEnemy(new Monster()) == null);
+        assertEquals(this.gMonster.enemy() == null, monster.getEnemy(new Monster()).isNull());
     }
 
     @Test

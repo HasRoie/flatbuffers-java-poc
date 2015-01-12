@@ -113,12 +113,12 @@ public class Monster extends Table implements Addressable {
         }
 
         public MonsterBuilder setHp(short value) {
-            Primitives.setShort(getBuffer(), initValueType(FIELD_HP, SIZEOF_SHORT), value);
+            Primitives.setShort(getBuffer(), initPrimitive(FIELD_HP, SIZEOF_SHORT), value);
             return this;
         }
 
         public MonsterBuilder setMana(short value) {
-            Primitives.setShort(getBuffer(), initValueType(FIELD_MANA, SIZEOF_SHORT), value);
+            Primitives.setShort(getBuffer(), initPrimitive(FIELD_MANA, SIZEOF_SHORT), value);
             return this;
         }
 

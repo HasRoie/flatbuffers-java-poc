@@ -49,8 +49,6 @@ public abstract class Table extends ReferenceType {
                 address = getReferenceTypeAddress(fieldId);
                 break;
         }
-        if (address == NULL)
-            return null;
         addressable.setAddress(address);
         return addressable;
     }
@@ -71,7 +69,7 @@ public abstract class Table extends ReferenceType {
         return Tables.initReferencePointer(getBuffer(), getAddress(), fieldId);
     }
 
-    protected int initValueType(int fieldId, int size) {
+    protected int initPrimitive(int fieldId, int size) {
         return Tables.initValueType(getBuffer(), getAddress(), fieldId, size, false);
     }
 
@@ -119,5 +117,6 @@ public abstract class Table extends ReferenceType {
 
         throw new IllegalArgumentException("Unknown builder type.");
     }
+
 
 }

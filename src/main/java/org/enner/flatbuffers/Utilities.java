@@ -13,6 +13,8 @@ public class Utilities {
 
     // Built-in types
     public static final int SIZEOF_BYTE = Byte.BYTES;
+    public static final int SIZEOF_BOOL = Byte.BYTES;
+    public static final int SIZEOF_ENUM = Byte.BYTES;
     public static final int SIZEOF_SHORT = Short.BYTES;
     public static final int SIZEOF_INT = Integer.BYTES;
     public static final int SIZEOF_LONG = Long.BYTES;
