@@ -35,15 +35,30 @@ public interface Vector extends Addressable {
         ByteVectorBuilder setByte(int index, byte value);
     }
 
-    public static class CombinedVector extends ReferenceType implements ByteVectorBuilder {
+    public static interface StructVector<T extends Addressable> extends Vector {
+        public T getStruct(T struct, int index);
+    }
 
-        public static CombinedVector newVector(ByteBuffer buffer, int address, int elementSize, boolean containsReferences) {
+    public static interface TableVector<T extends Addressable> extends Vector {
+        public T getTable(T table, int index);
+        public TableVector<T> setTable(int index, T table);
+    }
+
+    public static interface VectorVector<T extends Addressable> extends Vector {
+        public T getVector(T vector, int index);
+        public VectorVector<T> setVector(int index, T vector);
+    }
+
+    public static class CombinedVector<T extends Addressable> extends ReferenceType implements ByteVectorBuilder, StructVector<T>, TableVector<T>, VectorVector<T> {
+
+        @SuppressWarnings("unchecked")
+        public static <V extends Addressable> CombinedVector<V> newVector(ByteBuffer buffer, int address, int elementSize, boolean containsReferences) {
             CombinedVector vector = new CombinedVector();
             vector.setBuffer(buffer);
             vector.setAddress(address);
             vector.setContainsReferences(containsReferences);
             vector.setElementSize(elementSize);
-            return vector;
+            return (CombinedVector<V>) vector;
         }
 
         /**
@@ -98,6 +113,39 @@ public interface Vector extends Addressable {
             Primitives.setByte(getBuffer(), getValueTypeAddress(index), value);
             return this;
         }
+
+        @Override
+        public T getStruct(T struct, int index) {
+            struct.setAddress(getValueTypeAddress(index));
+            return struct;
+        }
+
+        @Override
+        public T getTable(T table, int index) {
+            table.setAddress(getReferenceTypeAddress(index));
+            return table;
+        }
+
+        @Override
+        public TableVector<T> setTable(int index, T table) {
+            int pointer = getValueTypeAddress(index);
+            Pointers.setReference(getBuffer(), pointer, table.getAddress());
+            return this;
+        }
+
+        @Override
+        public T getVector(T vector, int index) {
+            vector.setAddress(getReferenceTypeAddress(index));
+            return vector;
+        }
+
+        @Override
+        public VectorVector<T> setVector(int index, T vector) {
+            int pointer = getValueTypeAddress(index);
+            Pointers.setReference(getBuffer(), pointer, vector.getAddress());
+            return this;
+        }
+
     }
 
 }
