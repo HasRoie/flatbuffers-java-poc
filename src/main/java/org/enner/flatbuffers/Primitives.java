@@ -16,7 +16,7 @@ import static org.enner.flatbuffers.Utilities.*;
  * @author Florian Enner < florian @ hebirobotics.com >
  * @since 11 Jan 2015
  */
-public class Primitives {
+public final class Primitives {
 
     public static boolean getBoolean(ByteBuffer bb, int address, boolean defaultValue) {
         return address == NULL ? defaultValue : bb.get(address) != 0;

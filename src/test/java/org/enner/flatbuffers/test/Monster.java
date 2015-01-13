@@ -142,7 +142,7 @@ public final class Monster extends Table implements Addressable {
 
     public Monster createInventory(int length) {
         int pointer = initReferencePointer(INVENTORY_ID);
-        int address = Builders.addVector(getBuffer(), length, SIZEOF_BYTE, false);
+        int address = FlatBuffers.addVector(getBuffer(), length, SIZEOF_BYTE, false);
         Pointers.setReference(buffer, pointer, address);
         return this;
     }
@@ -166,7 +166,7 @@ public final class Monster extends Table implements Addressable {
 
     public Monster createWaypoints(int length) {
         int pointer = initReferencePointer(WAYPOINTS_ID);
-        int address = Builders.addVector(getBuffer(), length, Position.SIZEOF, false);
+        int address = FlatBuffers.addVector(getBuffer(), length, Position.SIZEOF, false);
         Pointers.setReference(buffer, pointer, address);
         return this;
     }
@@ -200,13 +200,13 @@ public final class Monster extends Table implements Addressable {
     }
 
     public Monster createAtRoot() {
-        int pointer = Builders.addRootTable(getBuffer(), fieldCount());
+        int pointer = FlatBuffers.addRootTable(getBuffer(), fieldCount());
         setAddress(Pointers.dereference(getBuffer(), pointer));
         return this;
     }
 
     public Monster create() {
-        setAddress(Builders.addTable(getBuffer(), fieldCount()));
+        setAddress(FlatBuffers.addTable(getBuffer(), fieldCount()));
         return this;
     }
 
@@ -264,7 +264,7 @@ public final class Monster extends Table implements Addressable {
 
     public Monster createFriends(int length) {
         int pointer = initReferencePointer(FRIENDS_ID);
-        int address = Builders.addVector(getBuffer(), length, SIZEOF_POINTER, true);
+        int address = FlatBuffers.addVector(getBuffer(), length, SIZEOF_POINTER, true);
         Pointers.setReference(buffer, pointer, address);
         return this;
     }

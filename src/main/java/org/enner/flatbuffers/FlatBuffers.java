@@ -10,7 +10,7 @@ import static org.enner.flatbuffers.Utilities.*;
  * @author Florian Enner < florian @ hebirobotics.com >
  * @since 11 Jan 2015
  */
-public class Builders {
+public class FlatBuffers {
 
     public static void skip(ByteBuffer buffer, int numBytes) {
         buffer.position(buffer.position() + numBytes);
@@ -20,7 +20,7 @@ public class Builders {
         int address = getNextAddress(buffer);
         skip(buffer, numBytes);
         if (memsetZero)
-            Builders.setZeros(buffer, address, numBytes);
+            FlatBuffers.setZeros(buffer, address, numBytes);
     }
 
     public static void setZeros(ByteBuffer buffer, int address, int length) {

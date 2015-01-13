@@ -105,7 +105,7 @@ public abstract class Table extends ReferenceType {
             // Build new table if none exists
             if (address == NULL) {
                 int numFields = ((Table) builder).fieldCount();
-                address = Builders.addTable(getBuffer(), numFields);
+                address = FlatBuffers.addTable(getBuffer(), numFields);
                 Pointers.setReference(getBuffer(), pointer, address);
             }
 

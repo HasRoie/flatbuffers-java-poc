@@ -1,6 +1,6 @@
 package org.enner.flatbuffers.validation;
 
-import org.enner.flatbuffers.Builders;
+import org.enner.flatbuffers.FlatBuffers;
 import org.enner.flatbuffers.Vector;
 import org.enner.flatbuffers.Vector.ByteVector;
 import org.enner.flatbuffers.Vector.CombinedVector;
@@ -101,7 +101,7 @@ public class PocTestData {
         // position.recycle()
 
         // return as byte array
-        return Builders.getSizedByteArray(buffer, 0, buffer.position());
+        return FlatBuffers.getSizedByteArray(buffer, 0, buffer.position());
 
     }
 

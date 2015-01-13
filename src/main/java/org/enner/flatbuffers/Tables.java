@@ -14,7 +14,7 @@ import static org.enner.flatbuffers.Utilities.*;
  * @author Florian Enner < florian @ hebirobotics.com >
  * @since 10 Jan 2015
  */
-public class Tables {
+public final class Tables {
 
     /**
      * Returns true if there exists an entry in the vector table. Note that this can
@@ -86,9 +86,9 @@ public class Tables {
         if (address == NULL) {
             // Set the address first in order to make sure that we don't allocate memory
             // that we can't point to
-            address = Builders.getNextAddress(buffer);
+            address = FlatBuffers.getNextAddress(buffer);
             Tables.setValueTypeAddress(buffer, table, fieldId, address);
-            Builders.skipAndClear(buffer, size, memsetZero);
+            FlatBuffers.skipAndClear(buffer, size, memsetZero);
         }
         return address;
     }

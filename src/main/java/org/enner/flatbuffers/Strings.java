@@ -12,7 +12,7 @@ import static org.enner.flatbuffers.Utilities.*;
  * @author Florian Enner < florian @ hebirobotics.com >
  * @since 10 Jan 2015
  */
-public class Strings {
+public final class Strings {
 
     /**
      * Note: Edited from original Table.__string(int)
