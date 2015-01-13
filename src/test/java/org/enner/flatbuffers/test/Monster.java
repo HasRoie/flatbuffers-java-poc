@@ -42,7 +42,7 @@ import static org.enner.flatbuffers.Utilities.*;
  * - (deprecated)
  *
  * @author Florian Enner < florian @ hebirobotics.com >
- * @since 12 Jan 2015
+ * @since 10 Jan 2015
  */
 public final class Monster extends Table implements Builder {
 

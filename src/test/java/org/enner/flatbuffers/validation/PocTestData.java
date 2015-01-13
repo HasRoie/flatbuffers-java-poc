@@ -16,7 +16,7 @@ import java.nio.ByteBuffer;
  * Populates a buffer with some data created by this Api.
  *
  * @author Florian Enner < florian @ hebirobotics.com >
- * @since 12 Jan 2015
+ * @since 11 Jan 2015
  */
 public class PocTestData {
 
@@ -88,6 +88,17 @@ public class PocTestData {
                     .setY(i / 2)
                     .setZ(1);
         }
+
+        // Creating and iterating through a vector of vectors
+
+
+        // Creating and iterating through a vector of strings
+
+        // Recycle objects (maybe?)
+        // rootMonster.recycle()
+        // monster.recycle()
+        // vector.recycle()
+        // position.recycle()
 
         // return as byte array
         return Builders.getSizedByteArray(buffer, 0, buffer.position());
