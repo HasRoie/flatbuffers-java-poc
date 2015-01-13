@@ -26,17 +26,12 @@ public interface Addressable {
 
     public boolean isNull();
 
-
     public static enum Type {
         VALUE, // primitives / struct
         REFERENCE; // table / vector / string
     }
 
-    public static interface Builder extends Addressable {
-
-    }
-
-    public static abstract class BaseAddressable {
+    public static abstract class BaseAddressable implements Addressable {
 
         public abstract Type getType();
 

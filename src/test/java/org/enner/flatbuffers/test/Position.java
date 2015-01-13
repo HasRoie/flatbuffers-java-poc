@@ -1,6 +1,5 @@
 package org.enner.flatbuffers.test;
 
-import org.enner.flatbuffers.Addressable.Builder;
 import org.enner.flatbuffers.Struct;
 
 import java.nio.ByteBuffer;
@@ -27,7 +26,7 @@ import static org.enner.flatbuffers.Utilities.*;
  * @author Florian Enner < florian @ hebirobotics.com >
  * @since 10 Jan 2015
  */
-public class Position extends Struct implements Builder {
+public class Position extends Struct {
 
     public float getX() {
         return getFloat(getBuffer(), getAddress() + X_OFFSET, 0);

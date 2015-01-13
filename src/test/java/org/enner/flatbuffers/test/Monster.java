@@ -1,6 +1,5 @@
 package org.enner.flatbuffers.test;
 
-import org.enner.flatbuffers.Addressable.Builder;
 import org.enner.flatbuffers.*;
 import org.enner.flatbuffers.Vector.ByteVector;
 import org.enner.flatbuffers.Vector.StructVector;
@@ -44,7 +43,7 @@ import static org.enner.flatbuffers.Utilities.*;
  * @author Florian Enner < florian @ hebirobotics.com >
  * @since 10 Jan 2015
  */
-public final class Monster extends Table implements Builder {
+public final class Monster extends Table implements Addressable {
 
     public boolean hasHp() {
         return hasField(HP_ID);
@@ -109,7 +108,7 @@ public final class Monster extends Table implements Builder {
     }
 
     public Position getOrCreatePosition(Position position) {
-        return getAddressableBuilder(position, POSITION_ID);
+        return getOrCreateAddressable(position, POSITION_ID);
     }
 
     public boolean hasEnemy() {
@@ -173,7 +172,7 @@ public final class Monster extends Table implements Builder {
     }
 
     public Monster getOrCreateEnemy(Monster enemy) {
-        return getAddressableBuilder(enemy, ENEMY_ID);
+        return getOrCreateAddressable(enemy, ENEMY_ID);
     }
 
     public boolean hasName() {

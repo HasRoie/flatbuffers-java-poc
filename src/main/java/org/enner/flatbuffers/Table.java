@@ -1,8 +1,6 @@
 package org.enner.flatbuffers;
 
-import org.enner.flatbuffers.Addressable.Builder;
 import org.enner.flatbuffers.Addressable.ReferenceType;
-import org.enner.flatbuffers.Addressable.Type;
 
 import static org.enner.flatbuffers.Utilities.*;
 
@@ -87,7 +85,7 @@ public abstract class Table extends ReferenceType {
      * @return A builder to an existing location, or to a newly allocated one
      * if none exists
      */
-    protected <T extends Builder> T getAddressableBuilder(T builder, int fieldId) {
+    protected <T extends Addressable> T getOrCreateAddressable(T builder, int fieldId) {
 
         if (builder instanceof Struct) {
             int address = getValueTypeAddress(fieldId);
@@ -115,7 +113,7 @@ public abstract class Table extends ReferenceType {
             return builder;
         }
 
-        throw new IllegalArgumentException("Unknown builder type.");
+        throw new IllegalArgumentException("Unknown addressable type.");
     }
 
 
