@@ -10,7 +10,7 @@ import static org.enner.flatbuffers.Utilities.*;
  * @author Florian Enner < florian @ hebirobotics.com >
  * @since 11 Jan 2015
  */
-public class FlatBuffers {
+public final class FlatBuffers {
 
     public static void skip(ByteBuffer buffer, int numBytes) {
         buffer.position(buffer.position() + numBytes);
