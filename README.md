@@ -2,9 +2,9 @@
 Proof of concept FlatBuffers implementation of an alternative Java Api
 
 ## Links
-* FlatBuffers https://github.com/google/flatbuffers
-* Original Syntax Sample https://github.com/ennerf/flatbuffers-java-poc/blob/master/src/test/java/org/enner/flatbuffers/validation/GoogleTestData.java
-* Proposed Syntax Sample https://github.com/ennerf/flatbuffers-java-poc/blob/master/src/test/java/org/enner/flatbuffers/validation/PocTestData.jav
+* [FlatBuffers Documentation](https://github.com/google/flatbuffers)
+* [Original Syntax Sample](https://github.com/ennerf/flatbuffers-java-poc/blob/master/src/test/java/org/enner/flatbuffers/validation/GoogleTestData.java)
+* [Proposed Syntax Sample](https://github.com/ennerf/flatbuffers-java-poc/blob/master/src/test/java/org/enner/flatbuffers/validation/PocTestData.java)
 
 ## Behavioral Differences
 * Values set to their defaults do not get omitted from serialization
