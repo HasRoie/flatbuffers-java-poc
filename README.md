@@ -7,6 +7,9 @@ Proof of concept FlatBuffers implementation of an alternative Java Api
 * [Proposed Syntax Sample](https://github.com/ennerf/flatbuffers-java-poc/blob/master/src/test/java/org/enner/flatbuffers/validation/PocTestData.java)
 
 ## Behavioral Differences
+* Buffers get built top-down for simpler Syntax. Vector Table pointers get initialized when they are set. If necessary, they can be initialized to NULL using initXXX() methods
+* Aside from reusable objects and String conversions, there is no allocation of dynamic memory whatsoever. The main goals for this Api are determinism and ease of use
+* Raw addresses are not exposed to the user when using the object api
 * Values set to their defaults do not get omitted from serialization
 * Table payload is not limited to contiguous memory
 * Vector tables currently aren't shared, but could be
