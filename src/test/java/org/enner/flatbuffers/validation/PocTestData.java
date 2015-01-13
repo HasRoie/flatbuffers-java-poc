@@ -30,32 +30,34 @@ public class PocTestData {
         Position position = Position.withBuffer(buffer);
 
         // Create main monster
-        rootMonster.createAtRoot()
-                .setHp((short) 80)
-                .setColor(Color.GREEN)
-                .getOrCreatePosition(position)
-                .setX(1)
+        rootMonster.createAtRoot() // also creates root pointer
+                .setHp((short) 80) // appends hp to buffer
+                .setMana((short)120) // appends mana to buffer
+                .setHp((short) 30) // overwrites existing hp
+                .setColor(Color.GREEN) // appends enum to buffer
+                .getOrCreatePosition(position) // reserves space and returns typed struct
+                .setX(1) // writes to the reserved space in struct
                 .setY(2)
                 .setZ(3);
 
-        // Create inventory
+        // Create inventory (vector of bytes)
         ByteVector inventory = rootMonster
-                .createInventory(5)
-                .getInventory(vector);
+                .createInventory(5) // creates an n element byte vector
+                .getInventory(vector); // returns type-safe vector
 
         // Populate inventory
-        int length = inventory.length();
+        int length = inventory.length(); // get length of vector
         for (int i = 0; i < length; i++) {
-            inventory.setByte(i, (byte) i);
+            inventory.setByte(i, (byte) i); // sets byte at index
         }
 
-        // Add a monster enemy
+        // Add a monster enemy (referenced table)
         rootMonster
-                .getOrCreateEnemy(monster)
+                .getOrCreateEnemy(monster) // appends a new monster to buffer
                 .setColor(Color.RED)
                 .setHp((short) 200)
                 .getOrCreatePosition(position)
-                .setAll(3, 4, 5);
+                .setAll(3, 4, 5); // sets all struct fields at once (better to avoid potential garbage)
 
         // Create a vector of monster friends (vector of tables)
         int numFriends = 10;
@@ -66,14 +68,14 @@ public class PocTestData {
         // Populate friends
         for (int i = 0; i < numFriends; i++) {
 
-            Monster friend = monster.create()
+            Monster friend = monster.create() // creates a new monster at end of buffer
                     .setColor(Color.BLUE)
                     .setHp((short) (100 * i));
 
             // Note that we can't refer to previously
             // created monsters due to the uint32 reference
             // restriction.
-            friends.setTable(i, friend);
+            friends.setTable(i, friend); // sets reference to newly created monster
 
         }
 
@@ -89,10 +91,10 @@ public class PocTestData {
                     .setZ(1);
         }
 
-        // Creating and iterating through a vector of vectors
+        // Create and iterate a vector of vectors
 
 
-        // Creating and iterating through a vector of strings
+        // Create and iterate a vector of strings
 
         // Recycle objects (maybe?)
         // rootMonster.recycle()
@@ -100,7 +102,7 @@ public class PocTestData {
         // vector.recycle()
         // position.recycle()
 
-        // return as byte array
+        // return as byte array. Valid data is between start and the current position
         return FlatBuffers.getSizedByteArray(buffer, 0, buffer.position());
 
     }
