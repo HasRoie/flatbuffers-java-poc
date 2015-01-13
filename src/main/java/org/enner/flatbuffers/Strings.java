@@ -34,7 +34,10 @@ public class Strings {
             // We can't access .array(), since the ByteBuffer is read-only.
             // We're forced to make an extra copy:
             byte[] copy = new byte[length];
-            buffer.get(copy, start, length);
+            int position = buffer.position();
+            buffer.position(start);
+            buffer.get(copy);
+            buffer.position(position);
             return new String(copy, 0, copy.length, UTF_8);
         }
     }

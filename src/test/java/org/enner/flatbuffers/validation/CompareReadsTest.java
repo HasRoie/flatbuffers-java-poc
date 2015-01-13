@@ -46,19 +46,19 @@ public class CompareReadsTest {
     @Test
     public void testGetPos() throws Exception {
         monster.getPosition(pos);
-        assertEquals(this.gPos.x(), pos.getX(), 0);
-        assertEquals(this.gPos.y(), pos.getY(), 0);
-        assertEquals(this.gPos.z(), pos.getZ(), 0);
+        assertEquals(gPos.x(), pos.getX(), 0);
+        assertEquals(gPos.y(), pos.getY(), 0);
+        assertEquals(gPos.z(), pos.getZ(), 0);
     }
 
     @Test
     public void testGetMana() throws Exception {
-        assertEquals(this.gMonster.mana(), monster.getMana());
+        assertEquals(gMonster.mana(), monster.getMana());
     }
 
     @Test
     public void testGetName() throws Exception {
-//        assertEquals(this.gMonster.name(), monster.getName());
+        assertEquals(gMonster.name(), monster.getName());
     }
 
     @Test
@@ -83,20 +83,20 @@ public class CompareReadsTest {
 
     @Test
     public void testGetColor() throws Exception {
-        assertEquals(this.gMonster.color(), monster.getColor().getValue());
+        assertEquals(gMonster.color(), monster.getColor().getValue());
     }
 
     @Test
     public void testGetEnemy() throws Exception {
-        assertEquals(this.gMonster.enemy() == null, monster.getEnemy(new Monster()).isNull());
+        assertEquals(gMonster.enemy() == null, monster.getEnemy(new Monster()).isNull());
     }
 
     @Test
     public void testArrayOfStrings() throws Exception {
        /* int length = monster.getTestArrayOfStringLength();
-        assertEquals(this.gMonster.testarrayofstringLength(), length);
+        assertEquals(gMonster.testarrayofstringLength(), length);
         for (int i = 0; i < length; i++) {
-            assertEquals(this.gMonster.testarrayofstring(i), monster.getTestArrayOfString(i));
+            assertEquals(gMonster.testarrayofstring(i), monster.getTestArrayOfString(i));
         }*/
     }
 
