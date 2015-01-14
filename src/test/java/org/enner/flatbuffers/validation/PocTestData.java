@@ -84,7 +84,8 @@ public class PocTestData {
                 .createWaypoints(30)
                 .getWaypoints(vector);
 
-        for (int i = waypoints.length(); i >= 0; i++) {
+        length = waypoints.length();
+        for (int i = 0; i < length; i++) {
             waypoints.getStruct(position, i)
                     .setX(i * 2)
                     .setY(i / 2)
@@ -95,6 +96,7 @@ public class PocTestData {
 
 
         // Create and iterate a vector of strings
+
 
         // Recycle objects (maybe?)
         // rootMonster.recycle()
